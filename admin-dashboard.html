@@ -443,11 +443,35 @@
 
     async function createProduct(form) {
       try {
-        const fd = new FormData(form);
-        const res = await fetch('/api/products', { method: 'POST', body: fd, credentials: 'same-origin' });
+        const fileInput = form.querySelector('input[name="productImage"]');
+        let imageUrl = null;
+        if (fileInput && fileInput.files && fileInput.files.length > 0) {
+          const file = fileInput.files[0];
+          if (window._FirebaseClient && window._FirebaseClient.uploadImageToStorage) {
+            imageUrl = await window._FirebaseClient.uploadImageToStorage(file, 'products');
+          } else {
+            // fallback to form upload
+            const fd = new FormData(form);
+            const res = await fetch('/api/products', { method: 'POST', body: fd, credentials: 'same-origin' });
+            if (res.ok) { alert('Product created'); form.reset(); loadProducts(); return; }
+            else { const json = await res.json(); alert(json.error || 'Failed to create'); return; }
+          }
+        }
+
+        // Submit metadata to server (imageUrl will be used)
+        const payload = {
+          productName: form.productName.value,
+          price: form.price.value,
+          description: form.description.value,
+          discount: form.discount.value || null,
+          category: form.category.value || null,
+          size: form.size.value || null,
+          imageUrl
+        };
+        const res = await fetch('/api/products', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify(payload) });
         if (res.ok) { alert('Product created'); form.reset(); loadProducts(); }
         else { const json = await res.json(); alert(json.error || 'Failed to create'); }
-      } catch (err) { console.error(err); alert('Error creating product'); }
+      } catch (err) { console.error(err); alert('Error creating product: ' + (err.message||err)); }
     }
 
     async function deleteProduct(id) {

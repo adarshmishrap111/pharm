@@ -141,6 +141,11 @@
         </div>
     </div>
     
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    <script src="/firebase-config.js"></script>
+    <script src="/firebase-client.js"></script>
     <script>
         const form = document.getElementById('registerForm');
         const alert = document.getElementById('alert');
@@ -181,25 +186,26 @@
             submitBtn.textContent = 'Creating Account...';
             
             try {
-                const res = await fetch('/api/user/register', {
+                // Try registering via Firebase first (client-side)
+                if (window._FirebaseClient) {
+                  await window._FirebaseClient.registerWithEmail(formData.name, formData.email, formData.password, formData.phone);
+                  showAlert('Account created successfully! Redirecting...', 'success');
+                  form.reset();
+                  setTimeout(() => window.location.href = '/login.html', 1400);
+                } else {
+                  // Fallback to server registration
+                  const res = await fetch('/api/user/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(formData)
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
-                    showAlert('Account created successfully! Redirecting...', 'success');
-                    form.reset();
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 2000);
-                } else {
-                    showAlert(data.error || 'Registration failed!', 'error');
+                  });
+                  const data = await res.json();
+                  if (res.ok) { showAlert('Account created successfully! Redirecting...', 'success'); form.reset(); setTimeout(() => window.location.href = '/login.html', 1400); }
+                  else { showAlert(data.error || 'Registration failed!', 'error'); }
                 }
             } catch (err) {
-                showAlert('Network error. Please try again.', 'error');
+                console.error('Register error', err);
+                showAlert((err && err.message) ? err.message : 'Network error. Please try again.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Create Account';

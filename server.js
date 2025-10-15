@@ -303,8 +303,7 @@ async function initDb() {
     `);
   } catch (err) { console.error('Error ensuring carts/orders tables', err); }
 }
-initDb().catch(err => console.error('DB init error', err));
-
+// Note: DB initialization is now performed during startup so we can log and fail fast on errors
 // Simple health route
 app.get('/api/health', (req, res) => {
   res.json({ ok: true, message: 'Pharm backend running' });
@@ -520,17 +519,32 @@ app.put('/api/products/:id', requireAdmin, upload.single('productImage'), async 
     const { name, price, description, discount, category, size } = req.body;
     const product = await db.get('SELECT * FROM products WHERE id = ?', id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-
-    let imageUrl = product.imageUrl;
+    // Determine final imageUrl: prefer newly uploaded local file, then provided imageUrl, else keep existing
+    let imageUrl = product.imageUrl || null;
     if (req.file) {
-      // remove old file
-      const oldPath = path.join(__dirname, product.imageUrl || '');
-      if (product.imageUrl) await fs.unlink(oldPath).catch(() => {});
+      // remove old local file if it exists and looks like a local path
+      if (product.imageUrl && product.imageUrl.startsWith('/uploads/')) {
+        const oldPath = path.join(__dirname, product.imageUrl);
+        await fs.unlink(oldPath).catch(() => {});
+      }
       imageUrl = `/uploads/${req.file.filename}`;
+    } else if (req.body && req.body.imageUrl) {
+      imageUrl = req.body.imageUrl;
     }
 
-    await db.run('UPDATE products SET name=?, price=?, description=?, imageUrl=?, discount=?, category=?, size=? WHERE id=?',
-      name || product.name, price ? Number(price) : product.price, description || product.description, imageUrl, discount || product.discount, category || product.category, size || product.size, id);
+    // Update product record
+    await db.run(
+      'UPDATE products SET name = ?, price = ?, description = ?, imageUrl = ?, discount = ?, category = ?, size = ? WHERE id = ?',
+      name || product.name,
+      (price !== undefined && price !== null && price !== '') ? Number(price) : product.price,
+      description || product.description,
+      imageUrl,
+      discount || product.discount,
+      category || product.category,
+      size || product.size,
+      id
+    );
+
     const updated = await db.get('SELECT * FROM products WHERE id = ?', id);
     broadcastEvent({ type: 'product_updated', product: updated });
     res.json({ ok: true, product: updated });
@@ -1032,15 +1046,31 @@ app.get('/api/payments', requireAdmin, async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-  console.log('✅ User Authentication: Enabled');
-  console.log('✅ Payment Gateway: Razorpay');
-  console.log('✅ Email Notifications: Configured');
-  console.log('\n⚠️  Remember to set environment variables:');
-  console.log('   - RAZORPAY_KEY_ID');
-  console.log('   - RAZORPAY_KEY_SECRET');
-  console.log('   - EMAIL_USER');
-  console.log('   - EMAIL_PASS');
-  console.log('   - JWT_SECRET');
-});
+async function start() {
+  try {
+    console.log('Startup: ensuring uploads directory...');
+    await ensureUploadsDir();
+    console.log('Startup: initializing database...');
+    await initDb();
+    console.log('Startup: database initialized');
+
+    app.listen(PORT, () => {
+      console.log(`Server listening on port ${PORT}`);
+      console.log('✅ User Authentication: Enabled');
+      console.log('✅ Payment Gateway: Razorpay');
+      console.log('✅ Email Notifications: Configured');
+      console.log('\n⚠️  Remember to set environment variables:');
+      console.log('   - RAZORPAY_KEY_ID');
+      console.log('   - RAZORPAY_KEY_SECRET');
+      console.log('   - EMAIL_USER');
+      console.log('   - EMAIL_PASS');
+      console.log('   - JWT_SECRET');
+    });
+  } catch (err) {
+    console.error('Startup error', err && err.stack ? err.stack : err);
+    // exit with non-zero so Render marks deploy as failed
+    process.exit(1);
+  }
+}
+
+start();

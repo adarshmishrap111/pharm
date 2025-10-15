@@ -138,6 +138,10 @@
         </div>
     </div>
     
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="/firebase-config.js"></script>
+    <script src="/firebase-client.js"></script>
     <script>
         const form = document.getElementById('loginForm');
         const alert = document.getElementById('alert');
@@ -164,30 +168,35 @@
             submitBtn.textContent = 'Logging in...';
             
             try {
-                const res = await fetch('/api/user/login', {
+                // Try Firebase login first
+                if (window._FirebaseClient) {
+                  const user = await window._FirebaseClient.loginWithEmail(formData.email, formData.password);
+                  showAlert('Login successful! Redirecting...', 'success');
+                  localStorage.setItem('user_email', user.email);
+                  localStorage.setItem('user_name', user.displayName || '');
+                  localStorage.setItem('user_id', user.uid);
+                  setTimeout(() => window.location.href = '/index.html', 900);
+                } else {
+                  const res = await fetch('/api/user/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'same-origin',
                     body: JSON.stringify(formData)
-                });
-                
-                const data = await res.json();
-                
-                if (res.ok) {
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
                     showAlert('Login successful! Redirecting...', 'success');
-                    // Save user data
                     localStorage.setItem('user_email', data.user.email);
                     localStorage.setItem('user_name', data.user.name);
                     localStorage.setItem('user_id', data.user.id);
-                    
-                    setTimeout(() => {
-                        window.location.href = '/index.html';
-                    }, 1500);
-                } else {
+                    setTimeout(() => window.location.href = '/index.html', 1500);
+                  } else {
                     showAlert(data.error || 'Login failed!', 'error');
+                  }
                 }
             } catch (err) {
-                showAlert('Network error. Please try again.', 'error');
+                console.error('Login error', err);
+                showAlert((err && err.message) ? err.message : 'Network error. Please try again.', 'error');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
