@@ -1,0 +1,53 @@
+
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Edit Product - Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main style="max-width:900px;margin:24px auto;">
+    <h2>Edit Product</h2>
+    <div id="formArea"></div>
+  </main>
+  <script>
+    async function init() {
+      const params = new URLSearchParams(window.location.search);
+      const id = params.get('id');
+      if (!id) { document.getElementById('formArea').textContent = 'No id'; return; }
+      // check session first
+      try {
+        const sres = await fetch('/api/session', { credentials: 'same-origin' });
+        if (!sres.ok) { window.location.href = '/admin-login.html'; return; }
+      } catch (err) { window.location.href = '/admin-login.html'; return; }
+
+      const res = await fetch('/api/products');
+      const data = await res.json();
+      const p = data.products.find(x => String(x.id) === String(id));
+      if (!p) { document.getElementById('formArea').textContent = 'Product not found'; return; }
+      const html = `
+        <form id="editForm" enctype="multipart/form-data">
+          <input name="name" value="${p.name}" placeholder="Name" style="width:60%"><br><br>
+          <input name="price" value="${p.price}" placeholder="Price" type="number"><br><br>
+          <input name="productImage" type="file" accept="image/*"><br><br>
+          <textarea name="description">${p.description||''}</textarea><br><br>
+          <input name="discount" value="${p.discount||''}" placeholder="Discount"><br><br>
+          <button type="submit">Save</button>
+          <span id="status"></span>
+        </form>
+      `;
+      document.getElementById('formArea').innerHTML = html;
+      document.getElementById('editForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const res = await fetch('/api/products/'+id, { method: 'PUT', body: fd, credentials: 'same-origin' });
+        const data2 = await res.json();
+        document.getElementById('status').textContent = res.ok ? 'Saved' : (data2.error||'Error');
+        if (res.ok) setTimeout(()=>window.location='/admin.html',1200);
+      });
+    }
+    init();
+  </script>
+</body>
+</html>

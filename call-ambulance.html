@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Call Ambulance - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+        <main style="max-width:700px;margin:40px auto;padding:20px;">
+        <h2>🚑 Emergency Ambulance Service</h2>
+        <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+            <div style="background:#fff4f4;border-left:4px solid #ff5c5c;padding:16px;margin-bottom:20px;border-radius:6px;">
+                <strong style="color:#ff5c5c;">⚠️ Emergency Hotline:</strong>
+                <p style="margin:8px 0 0 0;">For immediate emergency, call <strong>102</strong> or use the form below to request an ambulance.</p>
+            </div>
+            
+            <div style="margin-bottom:30px;text-align:center;">
+                <a href="tel:102"><button style="background:#ff5c5c;color:#fff;font-size:1.3em;padding:16px 40px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(255,92,92,0.3);">🚑 Call Ambulance Now (102)</button></a>
+            </div>
+            
+            <hr style="border:none;border-top:1px solid #eee;margin:30px 0;">
+            
+            <h3>Request Ambulance Service</h3>
+            <p style="color:#666;margin-bottom:20px;">Fill the form below and we'll dispatch an ambulance to your location immediately.</p>
+            
+            <form id="ambulanceForm">
+                <label>Full Name *</label><br>
+                <input type="text" name="name" placeholder="Patient Name" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;"><br>
+                
+                <label>Contact Number *</label><br>
+                <input type="tel" name="phone" placeholder="Phone Number" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;"><br>
+                
+                <label>Full Address *</label><br>
+                <textarea name="address" placeholder="Complete address with landmarks" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;" rows="3"></textarea><br>
+                
+                <label>Emergency Type</label><br>
+                <select name="emergency" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;">
+                    <option value="General emergency">General Emergency</option>
+                    <option value="Heart attack">Heart Attack</option>
+                    <option value="Accident">Accident</option>
+                    <option value="Breathing problem">Breathing Problem</option>
+                    <option value="Other">Other</option>
+                </select><br>
+                
+                <button type="submit" id="submitBtn" style="background:#ff5c5c;color:#fff;padding:12px 24px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">🚑 Request Ambulance</button>
+                <span id="status" style="margin-left:12px;font-weight:600;"></span>
+            </form>
+            <div id="result" style="margin-top:20px;"></div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('ambulanceForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            const btn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Requesting...';
+            status.textContent = '';
+            result.innerHTML = '';
+            
+            const formData = {
+                name: e.target.name.value,
+                phone: e.target.phone.value,
+                address: e.target.address.value,
+                emergency: e.target.emergency.value
+            };
+            
+            try {
+                const res = await fetch('/api/ambulance', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    status.textContent = 'Request sent!';
+                    status.style.color = '#00aa00';
+                    result.innerHTML = `
+                        <div style="background:#e6ffe6;padding:20px;border-radius:8px;margin-top:16px;">
+                            <h3 style="margin:0 0 8px 0;color:#00aa00;">✓ Ambulance Requested</h3>
+                            <p style="margin:0;">Request ID: <strong>${data.request.id}</strong></p>
+                            <p style="margin:8px 0 0 0;">An ambulance has been dispatched to your location. You'll receive a call shortly.</p>
+                            <p style="margin:8px 0 0 0;font-size:0.9em;color:#666;">Status: <strong>${data.request.status}</strong></p>
+                        </div>
+                    `;
+                    e.target.reset();
+                } else {
+                    status.textContent = data.error || 'Request failed';
+                    status.style.color = '#ff0000';
+                }
+            } catch (err) {
+                status.textContent = 'Network error';
+                status.style.color = '#ff0000';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🚑 Request Ambulance';
+            }
+        };
+    </script>
+</body>
+</html>

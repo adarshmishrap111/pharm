@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Success - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .success-container {
+            max-width: 600px;
+            margin: 80px auto;
+            padding: 40px;
+            text-align: center;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .success-icon {
+            font-size: 5em;
+            color: #4fd17c;
+            margin-bottom: 20px;
+        }
+        .success-container h2 {
+            color: #206030;
+            margin-bottom: 10px;
+        }
+        .success-container p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .order-details {
+            background: #f8fff8;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .order-details p {
+            margin: 10px 0;
+            color: #206030;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            padding: 12px 30px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #4fd17c;
+            color: #fff;
+        }
+        .btn-secondary {
+            background: #fff;
+            color: #4fd17c;
+            border: 2px solid #4fd17c;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-container">
+        <div class="success-icon">✓</div>
+        <h2>Payment Successful!</h2>
+        <p>Your order has been placed successfully.</p>
+        
+        <div class="order-details" id="orderDetails">
+            <p><strong>Order ID:</strong> <span id="orderId">-</span></p>
+            <p><strong>Status:</strong> <span style="color:#4fd17c;">Confirmed</span></p>
+            <p><strong>Delivery:</strong> Within 2-3 business days</p>
+        </div>
+        
+        <p>You will receive an order confirmation email shortly.</p>
+        
+        <div class="btn-group">
+            <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+            <a href="#" id="trackOrderBtn" class="btn btn-secondary">Track Order</a>
+        </div>
+    </div>
+    
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('orderId');
+        if (orderId) {
+            document.getElementById('orderId').textContent = orderId;
+            // Setup track order button
+            document.getElementById('trackOrderBtn').href = '/track-order.html?id=' + orderId;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+[
+	{
+		"id": 1,
+		"name": "Kapiva Amla Juice 1L",
+		"price": 252,
+		"description": "Refreshing amla juice for daily health.",
+		"imageUrl": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	},
+	{
+		"id": 2,
+		"name": "Pampers Diaper Premium Care L",
+		"price": 1405,
+		"description": "Comfort fit diapers for babies.",
+		"imageUrl": "https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	},
+	{
+		"id": 3,
+		"name": "Horlicks Women's Plus 400g",
+		"price": 281,
+		"description": "Nutrition for active women.",
+		"imageUrl": "https://images.unsplash.com/photo-1464306076886-debede6b2b24?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	},
+	{
+		"id": 4,
+		"name": "PediaSure Powder",
+		"price": 1588,
+		"description": "Complete nutrition for kids.",
+		"imageUrl": "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	},
+	{
+		"id": 5,
+		"name": "Centrum Adults 50+",
+		"price": 617,
+		"description": "Multivitamin for adults 50+.",
+		"imageUrl": "https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	},
+	{
+		"id": 6,
+		"name": "Delight Roasted Cashews 200g",
+		"price": 468,
+		"description": "Roasted & salted cashews.",
+		"imageUrl": "https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=400&q=80",
+		"createdAt": "2025-10-03T00:00:00.000Z"
+	}
+]

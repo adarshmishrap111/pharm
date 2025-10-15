@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+        .payment-container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 30px;
+        }
+        .order-summary {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+        .order-items {
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .order-total {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #206030;
+            margin-top: 20px;
+            text-align: right;
+        }
+        .payment-methods {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        .payment-method {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border: 2px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .payment-method:hover {
+            border-color: #4fd17c;
+            background: #f0fff0;
+        }
+        .payment-method.selected {
+            border-color: #4fd17c;
+            background: #e6ffe6;
+        }
+        .payment-method input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+        }
+        .payment-method-info {
+            flex: 1;
+        }
+        .payment-method-info h3 {
+            margin: 0 0 5px 0;
+            color: #206030;
+        }
+        .payment-method-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.9em;
+        }
+        .btn-pay {
+            width: 100%;
+            padding: 16px;
+            background: #4fd17c;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .btn-pay:hover {
+            background: #219653;
+        }
+        .btn-pay:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+        </ul>
+    </nav>
+    
+    <div class="payment-container">
+        <h2>Complete Payment</h2>
+        
+        <div class="order-summary">
+            <h3>Order Summary</h3>
+            <div class="order-items" id="orderItems"></div>
+            <div class="order-total">
+                Total: ₹<span id="totalAmount">0</span>
+            </div>
+        </div>
+        
+        <div class="payment-methods">
+            <h3>Select Payment Method</h3>
+            
+            <label class="payment-method" onclick="selectMethod('razorpay')">
+                <input type="radio" name="paymentMethod" value="razorpay" checked>
+                <div class="payment-method-info">
+                    <h3>💳 Card/UPI/Net Banking</h3>
+                    <p>Pay securely using Razorpay - Cards, UPI, Net Banking, Wallets</p>
+                </div>
+            </label>
+            
+            <label class="payment-method" onclick="selectMethod('cod')">
+                <input type="radio" name="paymentMethod" value="cod">
+                <div class="payment-method-info">
+                    <h3>💵 Cash on Delivery</h3>
+                    <p>Pay cash when your order is delivered</p>
+                </div>
+            </label>
+            
+            <button class="btn-pay" id="payBtn" onclick="initiatePayment()">Proceed to Pay</button>
+        </div>
+    </div>
+    
+    <script>
+        let selectedMethod = 'razorpay';
+        let cartItems = [];
+        let totalAmount = 0;
+        
+        function selectMethod(method) {
+            selectedMethod = method;
+            document.querySelectorAll('.payment-method').forEach(pm => {
+                pm.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+        }
+        
+        function getCartId() {
+            const name = 'pharm_cart_id=';
+            const ca = document.cookie.split(';');
+            for (let c of ca) { 
+                c = c.trim(); 
+                if (c.indexOf(name) === 0) return c.substring(name.length); 
+            }
+            const id = 'c_' + Math.random().toString(36).slice(2, 10);
+            document.cookie = `pharm_cart_id=${id}; path=/`;
+            return id;
+        }
+        
+        function loadCart() {
+            cartItems = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+            const itemsDiv = document.getElementById('orderItems');
+            itemsDiv.innerHTML = '';
+            totalAmount = 0;
+            
+            if (!cartItems.length) {
+                itemsDiv.innerHTML = '<p>No items in cart. <a href="index.html">Go shopping</a></p>';
+                document.getElementById('payBtn').disabled = true;
+                return;
+            }
+            
+            cartItems.forEach(item => {
+                totalAmount += Number(item.price);
+                const div = document.createElement('div');
+                div.className = 'order-item';
+                div.innerHTML = `
+                    <span>${item.name}</span>
+                    <span>₹${Number(item.price).toFixed(2)}</span>
+                `;
+                itemsDiv.appendChild(div);
+            });
+            
+            document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
+        }
+        
+        async function initiatePayment() {
+            const btn = document.getElementById('payBtn');
+            btn.disabled = true;
+            btn.textContent = 'Processing...';
+            
+            const cartId = getCartId();
+            
+            if (selectedMethod === 'cod') {
+                // COD - Direct checkout
+                try {
+                    const res = await fetch('/api/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ cartId, paymentMethod: 'cod' })
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                        localStorage.removeItem('pharm_cart');
+                        window.location.href = '/payment-success.html?orderId=' + data.orderId;
+                    } else {
+                        alert(data.error || 'Order failed');
+                    }
+                } catch (err) {
+                    alert('Network error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = 'Proceed to Pay';
+                }
+            } else {
+                // Razorpay
+                try {
+                    const res = await fetch('/api/payment/create-order', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ amount: totalAmount, cartId })
+                    });
+                    const data = await res.json();
+                    
+                    if (res.ok) {
+                        openRazorpay(data);
+                    } else {
+                        alert(data.error || 'Payment initialization failed');
+                        btn.disabled = false;
+                        btn.textContent = 'Proceed to Pay';
+                    }
+                } catch (err) {
+                    alert('Network error');
+                    btn.disabled = false;
+                    btn.textContent = 'Proceed to Pay';
+                }
+            }
+        }
+        
+        function openRazorpay(orderData) {
+            const options = {
+                key: orderData.key,
+                amount: orderData.amount,
+                currency: orderData.currency,
+                order_id: orderData.orderId,
+                name: 'Pharmida Healthcare',
+                description: 'Order Payment',
+                image: '/assets/logo.png',
+                handler: async function(response) {
+                    // Verify payment
+                    try {
+                        const res = await fetch('/api/payment/verify', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature,
+                                cartId: orderData.cartId
+                            })
+                        });
+                        const data = await res.json();
+                        if (res.ok) {
+                            localStorage.removeItem('pharm_cart');
+                            window.location.href = '/payment-success.html?orderId=' + data.orderId;
+                        } else {
+                            alert('Payment verification failed');
+                        }
+                    } catch (err) {
+                        alert('Network error during verification');
+                    }
+                },
+                prefill: {
+                    name: localStorage.getItem('user_name') || '',
+                    email: localStorage.getItem('user_email') || '',
+                    contact: ''
+                },
+                theme: {
+                    color: '#4fd17c'
+                }
+            };
+            
+            const rzp = new Razorpay(options);
+            rzp.on('payment.failed', function(response) {
+                alert('Payment failed: ' + response.error.description);
+                document.getElementById('payBtn').disabled = false;
+                document.getElementById('payBtn').textContent = 'Proceed to Pay';
+            });
+            rzp.open();
+        }
+        
+        loadCart();
+    </script>
+</body>
+</html>
