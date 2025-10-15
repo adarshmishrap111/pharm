@@ -44,8 +44,24 @@ async function sendEmail(to, subject, html) {
   }
 }
 
+// Global error handlers to capture startup/runtime errors (helps Render logs)
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err && err.stack ? err.stack : err);
+  // keep process alive briefly to flush logs then exit
+  setTimeout(() => process.exit(1), 2000);
+});
+
+process.on('unhandledRejection', (reason, p) => {
+  console.error('UNHANDLED REJECTION at:', p, 'reason:', reason && reason.stack ? reason.stack : reason);
+  setTimeout(() => process.exit(1), 2000);
+});
+
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+console.log('Starting Pharm backend...');
+console.log('NODE_ENV=', process.env.NODE_ENV || '');
+console.log('PORT=', PORT);
 
 app.use(cors());
 app.use(express.json());
