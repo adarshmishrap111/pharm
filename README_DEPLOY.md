@@ -35,3 +35,13 @@ Security
 
 - For production, use a real DB (Postgres) and secure environment variables. Do not commit secrets to the repo.
 - Use HTTPS and proper CORS configuration for production.
+
+Continuous deploy with GitHub Actions -> Render
+1. In Render, go to your service and create a "Deploy Hooks" (Service > Deploys > Deploy Hooks).
+2. Create a new deploy hook and copy the URL.
+3. In your GitHub repo, go to Settings > Secrets > Actions and add a secret named `RENDER_DEPLOY_HOOK` with the hook URL.
+4. The included GitHub Actions workflow `.github/workflows/render-deploy.yml` posts to that hook on every push to `master`, triggering a Render deploy automatically.
+
+Notes:
+- The workflow only triggers a build on Render; actual build logs are visible in your Render dashboard.
+- Keep secrets secure and do not commit any credentials to the repo.
