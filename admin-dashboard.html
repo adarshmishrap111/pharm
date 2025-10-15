@@ -69,11 +69,13 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" onclick="showTab('orders')">Orders</button>
-      <button class="tab" onclick="showTab('profiles')">User Profiles</button>
-      <button class="tab" onclick="showTab('prescriptions')">Prescriptions</button>
-      <button class="tab" onclick="showTab('ambulance')">Ambulance Requests</button>
-      <button class="tab" onclick="showTab('doctor')">Doctor Appointments</button>
+      <button class="tab active" onclick="showTab(event,'orders')">Orders</button>
+      <button class="tab" onclick="showTab(event,'profiles')">User Profiles</button>
+      <button class="tab" onclick="showTab(event,'prescriptions')">Prescriptions</button>
+      <button class="tab" onclick="showTab(event,'ambulance')">Ambulance Requests</button>
+      <button class="tab" onclick="showTab(event,'doctor')">Doctor Appointments</button>
+      <button class="tab" onclick="showTab(event,'products')">Products</button>
+      <button class="tab" onclick="showTab(event,'payments')">Payments</button>
     </div>
 
     <!-- Orders Tab -->
@@ -170,6 +172,61 @@
         <tbody></tbody>
       </table>
     </div>
+
+    <!-- Products Tab -->
+    <div id="products" class="tab-content">
+      <h2>Products</h2>
+      <div style="margin-bottom:16px; display:flex; gap:12px; align-items:flex-start;">
+        <form id="productForm" style="background:#fff;padding:12px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.05);">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input name="productName" placeholder="Product name" required style="padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <input name="price" type="number" step="0.01" placeholder="Price" required style="padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <input name="category" placeholder="Category (e.g., Pain Relief)" style="padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <input name="size" placeholder="Size (e.g., 10 tablets)" style="padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <input name="discount" placeholder="Discount (optional)" style="padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <input name="productImage" type="file" accept="image/*" style="padding:8px;" />
+            <textarea name="description" placeholder="Description" rows="2" style="padding:8px;border-radius:6px;border:1px solid #ddd;width:100%;"></textarea>
+          </div>
+          <div style="margin-top:8px;text-align:right;">
+            <button type="submit" style="padding:8px 12px;background:#4fd17c;color:#fff;border:none;border-radius:6px;">Create Product</button>
+          </div>
+        </form>
+      </div>
+      <table class="data-table" id="productsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Image</th>
+            <th>Discount</th>
+            <th>Category</th>
+            <th>Size</th>
+            <th>Created</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Payments Tab -->
+    <div id="payments" class="tab-content">
+      <h2>Payments</h2>
+      <table class="data-table" id="paymentsTable">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Order ID</th>
+            <th>Amount</th>
+            <th>Method</th>
+            <th>Status</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
   </div>
 
   <script>
@@ -188,10 +245,10 @@
       window.location.href = '/admin-login.html';
     });
 
-    function showTab(tabName) {
+    function showTab(ev, tabName) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-      event.target.classList.add('active');
+      ev.currentTarget.classList.add('active');
       document.getElementById(tabName).classList.add('active');
     }
 
@@ -357,6 +414,75 @@
       } catch (err) { console.error(err); }
     }
 
+    // ========== Products ===========
+    async function loadProducts() {
+      try {
+        const res = await fetch('/api/products');
+        const data = await res.json();
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = '';
+        (data.products || []).forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.name}</td>
+            <td>₹${Number(p.price).toFixed(2)}</td>
+            <td>${p.imageUrl ? `<a href='${p.imageUrl}' target='_blank'>View</a>` : 'N/A'}</td>
+            <td>${p.discount || 'N/A'}</td>
+            <td>${p.category || 'N/A'}</td>
+            <td>${p.size || 'N/A'}</td>
+            <td>${formatDate(p.createdAt)}</td>
+            <td>
+              <button class="action-btn btn-delete" onclick="deleteProduct(${p.id})">Delete</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) { console.error(err); }
+    }
+
+    async function createProduct(form) {
+      try {
+        const fd = new FormData(form);
+        const res = await fetch('/api/products', { method: 'POST', body: fd, credentials: 'same-origin' });
+        if (res.ok) { alert('Product created'); form.reset(); loadProducts(); }
+        else { const json = await res.json(); alert(json.error || 'Failed to create'); }
+      } catch (err) { console.error(err); alert('Error creating product'); }
+    }
+
+    async function deleteProduct(id) {
+      if (!confirm('Delete product #' + id + '?')) return;
+      try {
+        const res = await fetch('/api/products/' + id, { method: 'DELETE', credentials: 'same-origin' });
+        if (res.ok) { loadProducts(); alert('Deleted'); }
+        else { alert('Delete failed'); }
+      } catch (err) { console.error(err); alert('Error'); }
+    }
+
+    document.getElementById('productForm').addEventListener('submit', function(e){ e.preventDefault(); createProduct(e.target); });
+
+    // ========== Payments ===========
+    async function loadPayments() {
+      try {
+        const res = await fetch('/api/payments', { credentials: 'same-origin' });
+        const data = await res.json();
+        const tbody = document.querySelector('#paymentsTable tbody');
+        tbody.innerHTML = '';
+        (data.payments || []).forEach(p => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${p.id}</td>
+            <td>${p.orderId}</td>
+            <td>₹${Number(p.amount).toFixed(2)}</td>
+            <td>${p.method}</td>
+            <td>${p.status}</td>
+            <td>${formatDate(p.createdAt)}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (err) { console.error(err); }
+    }
+
     async function updatePrescription(id, status) {
       try {
         await fetch(`/api/prescriptions/${id}`, {
@@ -393,12 +519,14 @@
       } catch (err) { console.error(err); }
     }
 
-    // Load all data on page load
-    loadOrders();
-    loadProfiles();
-    loadPrescriptions();
-    loadAmbulance();
-    loadDoctor();
+  // Load all data on page load
+  loadOrders();
+  loadProfiles();
+  loadPrescriptions();
+  loadAmbulance();
+  loadDoctor();
+  loadProducts();
+  loadPayments();
 
     // Auto-refresh every 30 seconds
     setInterval(() => {

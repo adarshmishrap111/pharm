@@ -154,6 +154,8 @@ async function initDb() {
       price REAL NOT NULL,
       description TEXT,
       imageUrl TEXT,
+      category TEXT,
+      size TEXT,
       createdAt TEXT
     );
   `);
@@ -163,6 +165,15 @@ async function initDb() {
     const hasDiscount = cols.some(c => c.name === 'discount');
     if (!hasDiscount) {
       await db.exec('ALTER TABLE products ADD COLUMN discount TEXT;');
+    }
+    // ensure category and size exist
+    const hasCategory = cols.some(c => c.name === 'category');
+    if (!hasCategory) {
+      await db.exec('ALTER TABLE products ADD COLUMN category TEXT;');
+    }
+    const hasSize = cols.some(c => c.name === 'size');
+    if (!hasSize) {
+      await db.exec('ALTER TABLE products ADD COLUMN size TEXT;');
     }
   } catch (err) {
     console.error('Error ensuring discount column', err);
@@ -288,6 +299,7 @@ app.get('/api/health', (req, res) => {
 app.post('/api/products', requireAdmin, upload.single('productImage'), async (req, res) => {
   try {
     const { productName, price, description, discount } = req.body;
+    const { category, size } = req.body;
     if (!productName || !price || !description) {
       if (req.file) await fs.unlink(req.file.path).catch(() => {});
       return res.status(400).json({ error: 'productName, price and description are required' });
@@ -297,8 +309,8 @@ app.post('/api/products', requireAdmin, upload.single('productImage'), async (re
     const imageUrl = `/uploads/${req.file.filename}`;
     const createdAt = new Date().toISOString();
     const result = await db.run(
-      'INSERT INTO products (name, price, description, imageUrl, createdAt, discount) VALUES (?, ?, ?, ?, ?, ?)',
-      productName, Number(price), description, imageUrl, createdAt, discount || null
+      'INSERT INTO products (name, price, description, imageUrl, createdAt, discount, category, size) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      productName, Number(price), description, imageUrl, createdAt, discount || null, category || null, size || null
     );
     const product = {
       id: result.lastID,
@@ -307,7 +319,9 @@ app.post('/api/products', requireAdmin, upload.single('productImage'), async (re
       description,
       imageUrl,
       createdAt,
-      discount: discount || null
+      discount: discount || null,
+      category: category || null,
+      size: size || null
     };
     broadcastEvent({ type: 'product_added', product });
     res.json({ ok: true, product });
@@ -487,7 +501,7 @@ app.get('/api/session', async (req, res) => {
 app.put('/api/products/:id', requireAdmin, upload.single('productImage'), async (req, res) => {
   try {
     const id = Number(req.params.id);
-    const { name, price, description, discount } = req.body;
+    const { name, price, description, discount, category, size } = req.body;
     const product = await db.get('SELECT * FROM products WHERE id = ?', id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
 
@@ -499,8 +513,8 @@ app.put('/api/products/:id', requireAdmin, upload.single('productImage'), async 
       imageUrl = `/uploads/${req.file.filename}`;
     }
 
-    await db.run('UPDATE products SET name=?, price=?, description=?, imageUrl=?, discount=? WHERE id=?',
-      name || product.name, price ? Number(price) : product.price, description || product.description, imageUrl, discount || product.discount, id);
+    await db.run('UPDATE products SET name=?, price=?, description=?, imageUrl=?, discount=?, category=?, size=? WHERE id=?',
+      name || product.name, price ? Number(price) : product.price, description || product.description, imageUrl, discount || product.discount, category || product.category, size || product.size, id);
     const updated = await db.get('SELECT * FROM products WHERE id = ?', id);
     broadcastEvent({ type: 'product_updated', product: updated });
     res.json({ ok: true, product: updated });
