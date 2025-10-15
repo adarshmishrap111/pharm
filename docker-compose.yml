@@ -1,0 +1,14 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./assets/uploads:/usr/src/app/assets/uploads
+      - ./data.sqlite:/usr/src/app/data.sqlite
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      # set other env variables or use an env file
+    restart: unless-stopped
