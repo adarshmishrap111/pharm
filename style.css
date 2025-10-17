@@ -33,35 +33,24 @@ section {
     padding: 30px;
 }
 
+/* Adjustments for full-width layout */
+main, section {
+  width: 100%;
+  max-width: none;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
 .carousel-container {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 32px;
-    overflow-x: auto;
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 4px 16px rgba(32,96,48,0.12);
-    padding: 24px 0;
-    margin-bottom: 40px;
+  width: 100%;
+  max-width: none;
+  padding: 16px 0;
 }
 
 .carousel-track {
-    display: flex;
-    gap: 32px;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    padding: 0 24px;
-    width: 100%;
-    max-width: 1800px;
-    box-sizing: border-box;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
-    background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 32px rgba(32,96,48,0.16);
-    margin-bottom: 40px;
-    transition: box-shadow 0.5s cubic-bezier(.23,1.01,.32,1);
+  width: 100%;
+  max-width: none;
+  padding: 0 16px;
 }
 
 /* Continuous smooth scroller tweaks */
@@ -519,6 +508,14 @@ footer {
         width: 100%;
         height: auto;
         max-height: 250px;
+    }
+
+    main, section {
+      padding: 10px;
+    }
+
+    .carousel-container {
+      padding: 10px 0;
     }
 }
 
