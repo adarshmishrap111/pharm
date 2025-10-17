@@ -715,68 +715,152 @@ footer {
   }
 }
 
-/* Responsive Design */
+/* ✅ General fixes */
+* {
+  box-sizing: border-box;
+}
 body {
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
-  line-height: 1.6;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow-x: hidden;
 }
 
-/* General container adjustments */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 15px;
-}
-
-/* Responsive grid system */
-.row {
+/* ✅ Header section responsive layout */
+.pharm-header {
   display: flex;
   flex-wrap: wrap;
-}
-
-.col {
-  flex: 1;
-  padding: 15px;
-}
-
-/* Navigation bar */
-.navbar {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #4fd17c;
-  color: white;
+  justify-content: space-between;
+  padding: 10px 15px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.header-left img {
+  max-width: 80px;
+  height: auto;
+}
+.header-center {
+  flex: 1;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.search-bar {
+  width: 90%;
+  max-width: 500px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.header-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-top: 10px;
+  gap: 10px;
+}
+.header-right {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.navbar a {
-  color: white;
-  text-decoration: none;
-  margin: 0 10px;
+/* ✅ Banner images scale properly */
+.banner-slider img {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-  .navbar {
+/* ✅ Product cards auto-adjust */
+.carousel-track {
+  display: flex;
+  gap: 15px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+}
+.product-card, .icon-card {
+  flex: 0 0 calc(25% - 15px);
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 10px;
+  text-align: center;
+}
+.product-card img, .icon-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* ✅ Make carousels fully scrollable on mobile */
+.carousel-container {
+  overflow-x: auto;
+  width: 100%;
+}
+.carousel-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* ✅ Footer responsive */
+footer div {
+  flex-wrap: wrap;
+}
+footer ul {
+  padding: 0;
+  list-style: none;
+}
+
+/* ✅ Tablet and mobile adjustments */
+@media (max-width: 992px) {
+  .pharm-header {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: center;
   }
-
-  .col {
-    flex: 100%;
+  .header-center, .header-right {
+    width: 100%;
+    text-align: center;
+  }
+  .product-card, .icon-card {
+    flex: 0 0 calc(50% - 10px);
+  }
+  .header-actions {
+    flex-direction: column;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-  .col {
-    flex: 50%;
+/* ✅ Mobile-only layout */
+@media (max-width: 600px) {
+  .product-card, .icon-card {
+    flex: 0 0 100%;
   }
-}
-
-@media (min-width: 1025px) {
-  .col {
-    flex: 33.33%;
+  .banner-text {
+    font-size: 1rem;
+  }
+  .header-btn {
+    font-size: 1rem !important;
+    padding: 10px 16px !important;
+  }
+  .news-bar marquee {
+    font-size: 0.8rem;
+  }
+  nav.main-tabs ul,
+  nav.category-tabs ul {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  nav.main-tabs li, nav.category-tabs li {
+    width: 48%;
+    margin-bottom: 6px;
+  }
+  footer {
+    text-align: center;
+  }
+  footer div {
+    justify-content: center;
   }
 }
