@@ -119,6 +119,14 @@
     <!-- Prescriptions Tab -->
     <div id="prescriptions" class="tab-content">
       <h2>Prescription Uploads</h2>
+      <div style="margin-bottom:12px;">
+        <form id="prescriptionUploadForm" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <input type="file" name="prescriptionFile" accept="image/*,application/pdf" capture="environment" required />
+          <input type="text" name="prescriptionNotes" placeholder="Notes (optional)" style="padding:8px;border-radius:6px;border:1px solid #ddd;min-width:220px;" />
+          <button type="submit" id="uploadPrescriptionBtn" style="padding:8px 12px;background:#2196f3;color:#fff;border:none;border-radius:6px;">Upload Prescription</button>
+          <button type="button" id="scanPrescriptionBtn" style="padding:8px 12px;background:#4fd17c;color:#fff;border:none;border-radius:6px;">Scan & Analyze</button>
+        </form>
+      </div>
       <table class="data-table" id="prescriptionsTable">
         <thead>
           <tr>
@@ -381,6 +389,58 @@
         });
       } catch (err) { console.error(err); }
     }
+
+    // Prescription upload (original upload) and scan (AI) handlers placed beside table
+    document.getElementById('prescriptionUploadForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const fileInput = form.querySelector('input[name="prescriptionFile"]');
+      const notes = form.prescriptionNotes.value || '';
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) { alert('Select a file to upload'); return; }
+      const fd = new FormData();
+      fd.append('prescription', fileInput.files[0]);
+      fd.append('notes', notes);
+      try {
+        const res = await fetch('/api/prescriptions', { method: 'POST', body: fd, credentials: 'same-origin' });
+        const data = await res.json();
+        if (res.ok) {
+          alert('Prescription uploaded');
+          form.reset();
+          loadPrescriptions();
+        } else {
+          alert(data.error || 'Upload failed');
+        }
+      } catch (err) { console.error('Upload error', err); alert('Network error during upload'); }
+    });
+
+    document.getElementById('scanPrescriptionBtn')?.addEventListener('click', async function(e) {
+      const form = document.getElementById('prescriptionUploadForm');
+      const fileInput = form.querySelector('input[name="prescriptionFile"]');
+      const notes = form.prescriptionNotes.value || '';
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) { alert('Select a file to scan'); return; }
+      const fd = new FormData();
+      fd.append('scan', fileInput.files[0]);
+      fd.append('notes', notes);
+      try {
+        const res = await fetch('/api/prescriptions/scan', { method: 'POST', body: fd, credentials: 'same-origin' });
+        const data = await res.json();
+        if (res.ok) {
+          // show AI result
+          const ai = data.aiResult || data.prescription?.notes || null;
+          if (ai) {
+            const aiPanel = document.getElementById('aiResult');
+            const aiJson = document.getElementById('aiResultJson');
+            aiPanel.style.display = 'block';
+            aiJson.textContent = typeof ai === 'string' ? ai : JSON.stringify(ai, null, 2);
+          }
+          alert('Scan uploaded and processed');
+          form.reset();
+          loadPrescriptions();
+        } else {
+          alert(data.error || 'Scan failed');
+        }
+      } catch (err) { console.error('Scan error', err); alert('Network error during scan'); }
+    });
 
     async function loadAmbulance() {
       try {
