@@ -71,7 +71,8 @@
     <div class="tabs">
       <button class="tab active" onclick="showTab(event,'orders')">Orders</button>
       <button class="tab" onclick="showTab(event,'profiles')">User Profiles</button>
-      <button class="tab" onclick="showTab(event,'prescriptions')">Prescriptions</button>
+  <button class="tab" onclick="showTab(event,'prescriptions')">Prescriptions</button>
+  <button class="tab" onclick="showTab(event,'scan')">Scan Prescription</button>
       <button class="tab" onclick="showTab(event,'ambulance')">Ambulance Requests</button>
       <button class="tab" onclick="showTab(event,'doctor')">Doctor Appointments</button>
       <button class="tab" onclick="showTab(event,'products')">Products</button>
@@ -131,6 +132,25 @@
         </thead>
         <tbody></tbody>
       </table>
+    </div>
+
+    <!-- Scan Prescription Tab -->
+    <div id="scan" class="tab-content">
+      <h2>Scan Prescription (AI Scan)</h2>
+      <div style="background:#fff;padding:16px;border-radius:8px;box-shadow:0 2px 6px rgba(0,0,0,0.05);max-width:720px;">
+        <form id="scanForm">
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+            <input type="file" name="scan" accept="image/*,application/pdf" required />
+            <input type="text" name="notes" placeholder="Optional notes" style="flex:1;padding:8px;border-radius:6px;border:1px solid #ddd;" />
+            <button type="submit" style="padding:8px 12px;background:#4fd17c;color:#fff;border:none;border-radius:6px;">Upload & Scan</button>
+          </div>
+        </form>
+
+        <div id="aiResult" style="margin-top:12px;display:none;background:#f7f9fb;padding:12px;border-radius:6px;">
+          <h3>AI Scan Result</h3>
+          <pre id="aiResultJson" style="white-space:pre-wrap"></pre>
+        </div>
+      </div>
     </div>
 
     <!-- Ambulance Tab -->
@@ -542,6 +562,40 @@
         loadDoctor();
       } catch (err) { console.error(err); }
     }
+
+    // Scan prescription upload handler
+    document.getElementById('scanForm')?.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = e.target;
+      const fileInput = form.querySelector('input[name="scan"]');
+      const notes = form.notes.value || '';
+      if (!fileInput || !fileInput.files || fileInput.files.length === 0) { alert('Select a file'); return; }
+      const fd = new FormData();
+      fd.append('scan', fileInput.files[0]);
+      fd.append('notes', notes);
+      try {
+        const res = await fetch('/api/prescriptions/scan', { method: 'POST', body: fd, credentials: 'same-origin' });
+        const data = await res.json();
+        if (res.ok) {
+          // Show AI result if present
+          const ai = data.aiResult || data.prescription?.notes || null;
+          const aiPanel = document.getElementById('aiResult');
+          const aiJson = document.getElementById('aiResultJson');
+          if (ai) {
+            aiPanel.style.display = 'block';
+            aiJson.textContent = typeof ai === 'string' ? ai : JSON.stringify(ai, null, 2);
+          }
+          form.reset();
+          loadPrescriptions();
+          alert('Scan uploaded and processed');
+        } else {
+          alert(data.error || 'Scan failed');
+        }
+      } catch (err) {
+        console.error('Scan upload error', err);
+        alert('Network error during scan upload');
+      }
+    });
 
   // Load all data on page load
   loadOrders();
