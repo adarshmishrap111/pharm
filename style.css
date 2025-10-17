@@ -662,6 +662,60 @@ footer {
 }
 
 /* Responsive Design */
+/* General adjustments for smaller screens */
+@media (max-width: 768px) {
+  body {
+    font-size: 14px;
+  }
+
+  .carousel-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  section {
+    padding: 20px;
+    margin-bottom: 20px;
+  }
+
+  .offer-products {
+    padding: 12px;
+    box-shadow: 0 4px 12px rgba(255,150,50,0.1);
+  }
+}
+
+/* Adjustments for tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+  body {
+    font-size: 16px;
+  }
+
+  .carousel-container {
+    gap: 24px;
+  }
+
+  section {
+    padding: 25px;
+  }
+}
+
+/* Desktop-specific styles */
+@media (min-width: 1025px) {
+  body {
+    font-size: 18px;
+  }
+
+  .carousel-container {
+    gap: 32px;
+  }
+
+  section {
+    padding: 30px;
+  }
+}
+
+/* Responsive Design */
 body {
   margin: 0;
   padding: 0;
