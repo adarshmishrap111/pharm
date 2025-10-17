@@ -1,5 +1,9 @@
+// Import required modules
 const express = require('express');
+const bodyParser = require('body-parser');
 const cors = require('cors');
+const dotenv = require('dotenv');
+const admin = require('firebase-admin');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
@@ -44,8 +48,23 @@ async function sendEmail(to, subject, html) {
   }
 }
 
+// Initialize environment variables
+dotenv.config();
+
+// Initialize Firebase Admin SDK (DISABLED FOR LOCAL DEVELOPMENT)
+// const serviceAccount = require('./firebase-adminsdk.json'); 
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount),
+//   storageBucket: "pharmida-healthcare.appspot.com",
+// });
+
+// const firestoreDb = admin.firestore(); // DISABLED FOR LOCAL DEVELOPMENT
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000; // Changed to 3000 for local development
+
+// Middleware
+app.use(cors());
+app.use(bodyParser.json());
 
 // Redirect root domain (non-www) to www
 app.use((req, res, next) => {
