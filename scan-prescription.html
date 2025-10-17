@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scan Prescription - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+        <main style="max-width:800px;margin:40px auto;padding:20px;">
+        <h2>AI Prescription Scanner</h2>
+        <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+            <div style="background:linear-gradient(135deg, #667eea 0%, #764ba2 100%);color:#fff;padding:20px;border-radius:8px;margin-bottom:20px;">
+                <h3 style="margin:0 0 8px 0;">🤖 AI-Powered Prescription Analysis</h3>
+                <p style="margin:0;opacity:0.9;">Upload your prescription and our AI will instantly extract medicine names, dosage, and instructions.</p>
+            </div>
+            <form id="scanForm" enctype="multipart/form-data">
+                <label>Choose Prescription Image/PDF</label><br>
+                <input type="file" name="scan" accept="image/*,application/pdf" required style="margin:10px 0 20px 0;"><br>
+                <button type="submit" id="scanBtn" style="background:#667eea;color:#fff;padding:12px 24px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">🔍 Scan with AI</button>
+                <span id="status" style="margin-left:12px;font-weight:600;"></span>
+            </form>
+            <div id="scanResult" style="margin-top:24px;"></div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('scanForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            const btn = document.getElementById('scanBtn');
+            const result = document.getElementById('scanResult');
+            
+            btn.disabled = true;
+            btn.textContent = '🔍 Scanning...';
+            status.textContent = '';
+            result.innerHTML = '<div style="text-align:center;padding:20px;"><div style="display:inline-block;width:40px;height:40px;border:4px solid #f3f3f3;border-top:4px solid #667eea;border-radius:50%;animation:spin 1s linear infinite;"></div></div><style>@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}</style>';
+            
+            const fd = new FormData(e.target);
+            
+            try {
+                const res = await fetch('/api/prescriptions/scan', {
+                    method: 'POST',
+                    body: fd
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    status.textContent = 'Scan completed!';
+                    status.style.color = '#00aa00';
+                    const ai = data.aiResult;
+                    result.innerHTML = `
+                        <div style="background:#f0f7ff;padding:20px;border-radius:8px;border-left:4px solid #667eea;">
+                            <h3 style="margin:0 0 12px 0;color:#667eea;">✨ AI Scan Results</h3>
+                            <div style="background:#fff;padding:16px;border-radius:6px;margin-bottom:12px;">
+                                <strong style="color:#667eea;">Detected Medicines:</strong>
+                                <ul style="margin:8px 0;padding-left:20px;">
+                                    ${ai.medicines.map(m => `<li>${m}</li>`).join('')}
+                                </ul>
+                            </div>
+                            <div style="background:#fff;padding:16px;border-radius:6px;margin-bottom:12px;">
+                                <strong style="color:#667eea;">Dosage Instructions:</strong>
+                                <p style="margin:8px 0 0 0;">${ai.dosage}</p>
+                            </div>
+                            <div style="background:#fff;padding:16px;border-radius:6px;">
+                                <strong style="color:#667eea;">AI Confidence:</strong> ${ai.confidence}
+                            </div>
+                            <p style="margin:16px 0 0 0;font-size:0.9em;color:#666;"><strong>Prescription ID:</strong> ${data.prescription.id} | <a href="${data.prescription.fileUrl}" target="_blank">View Original File</a></p>
+                        </div>
+                    `;
+                    e.target.reset();
+                } else {
+                    status.textContent = data.error || 'Scan failed';
+                    status.style.color = '#ff0000';
+                    result.innerHTML = '';
+                }
+            } catch (err) {
+                status.textContent = 'Network error';
+                status.style.color = '#ff0000';
+                result.innerHTML = '';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔍 Scan with AI';
+            }
+        };
+    </script>
+</body>
+</html>

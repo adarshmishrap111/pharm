@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Product Upload - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Upload New Product</h2>
+        <form id="productUploadForm" enctype="multipart/form-data" style="max-width:600px;">
+            <label>Product Name</label><br>
+            <input type="text" name="productName" placeholder="Product Name" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"><br><br>
+            <label>Price</label><br>
+            <input type="number" name="price" placeholder="Price" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"><br><br>
+            <label>Image</label><br>
+            <input type="file" name="productImage" accept="image/*" required><br><br>
+            <label>Description</label><br>
+            <textarea name="description" placeholder="Product Description" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"></textarea><br><br>
+            <label>Discount (optional, e.g. "10% Off")</label><br>
+            <input type="text" name="discount" placeholder="10% Off" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"><br><br>
+            <button id="uploadBtn" type="submit" style="background:#4fd17c;color:#fff;padding:10px 18px;border:none;border-radius:8px;">Upload Product</button>
+            <span id="status" style="margin-left:12px;font-weight:600;color:#206030"></span>
+        </form>
+        <div id="result" style="margin-top:24px;"></div>
+    </main>
+    <script>
+        const form = document.getElementById('productUploadForm');
+        const statusEl = document.getElementById('status');
+        const resultEl = document.getElementById('result');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            statusEl.textContent = '';
+            resultEl.innerHTML = '';
+            const btn = document.getElementById('uploadBtn');
+            btn.disabled = true; btn.textContent = 'Uploading...';
+        try {
+            const fd = new FormData(form);
+            const res = await fetch('/api/products', { method: 'POST', body: fd, credentials: 'same-origin' });
+                const data = await res.json();
+                if (!res.ok) {
+                    statusEl.style.color = 'crimson';
+                    statusEl.textContent = data.error || 'Upload failed';
+                } else {
+                    statusEl.style.color = '#206030';
+                    statusEl.textContent = 'Uploaded ✓';
+                    const p = data.product;
+                    resultEl.innerHTML = `\
+                        <h3>Uploaded Product</h3>\
+                        <div style="display:flex;gap:16px;align-items:center;">\
+                            <img src="${p.imageUrl}" style="width:120px;height:120px;object-fit:contain;border-radius:8px;" />\
+                            <div>\
+                                <strong>${p.name}</strong><br/>\
+                                <span style="color:#206030;font-weight:700">₹${Number(p.price).toFixed(2)}</span><br/>\
+                                <p style="max-width:480px">${p.description || ''}</p>\
+                                <button onclick="window.location='index.html'" style="background:#4fd17c;color:#fff;border:none;padding:8px 12px;border-radius:8px;">View on Home</button>\
+                            </div>\
+                        </div>`;
+                    form.reset();
+                    // redirect to home after short delay (SSE also will notify)
+                    setTimeout(() => { window.location = 'index.html'; }, 1400);
+                }
+            } catch (err) {
+                statusEl.style.color = 'crimson';
+                statusEl.textContent = 'Network error';
+                console.error(err);
+            } finally {
+                btn.disabled = false; btn.textContent = 'Upload Product';
+                setTimeout(() => { statusEl.textContent = ''; }, 4000);
+            }
+        });
+                // require admin session to access upload page
+                (async function(){
+                    try {
+                        const s = await fetch('/api/session', { credentials: 'same-origin' });
+                        if (!s.ok) { window.location = '/admin-login.html'; }
+                    } catch (e) { window.location = '/admin-login.html'; }
+                })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="news-bar">
+        <marquee behavior="scroll" direction="left">
+            Pharmida Healthcare - Your health is our mission | Free home delivery above order on 499 | High discount | Fast delivery | 24x7 Support | Genuine Medicines | Best Price Guarantee
+        </marquee>
+    </div>
+    <header class="pharm-header">
+        <div class="header-left">
+            <img src="c:/Users/Admin/Downloads/logo png.png" alt="Pharmida Healthcare Logo" class="logo" style="border-radius: 50%;">
+        </div>
+        <div class="header-center">
+            <input type="text" class="search-bar" placeholder="Search from our 1,00,000+ products">
+            <div class="header-actions">
+                                <button class="header-btn ambulance" onclick="window.location='/call-ambulance.html'" style="font-size:1.2em;padding:14px 32px;margin-left:12px;border-radius:10px;background:#ff5c5c;color:#fff;font-weight:600;cursor:pointer;"><span>🚑</span> Call Nearby Ambulance</button>
+                <button class="header-btn doctor" onclick="window.location='/doctor-on-call.html'" style="font-size:1.2em;padding:14px 32px;margin-left:12px;border-radius:10px;background:#2196f3;color:#fff;font-weight:600;cursor:pointer;"><span>👨‍⚕️</span> Doctor on Call</button>
+            </div>
+        </div>
+        <div class="header-right">
+                                    <a href="#" class="header-icon" title="Account" id="userAccount">
+                <span id="userAccountText">Login</span>
+            </a>
+            <script>
+                // Check if user is logged in
+                (async function() {
+                    const userName = localStorage.getItem('user_name');
+                    const userEmail = localStorage.getItem('user_email');
+                    if (userName && userEmail) {
+                        document.getElementById('userAccountText').textContent = userName;
+                        document.getElementById('userAccount').href = 'profile.html';
+                    } else {
+                        document.getElementById('userAccount').href = 'login.html';
+                    }
+                })();
+            </script>
+            <a href="#offers" class="header-icon" title="Offers">
+                <span>Offers</span>
+            </a>
+            <a href="cart.html" class="header-icon" title="Cart">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" stroke="#206030" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61l1.38-7.39H6"/></svg>
+            </a>
+            <a href="tel:1234567890" class="header-icon" title="Call">
+                <span>Call</span>
+            </a>
+                        <button class="header-btn upload-btn" style="font-size:1.2em;padding:12px 28px;cursor:pointer;" onclick="window.location='/upload-prescription.html'"><span>📤</span> Upload Prescription</button>
+            <button class="header-btn scan-btn" style="font-size:1.2em;padding:12px 28px;display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="window.location='/scan-prescription.html'"><span>📷</span> Scan Prescription</button>
+        </div>
+    </header>
+    <nav class="main-tabs">
+        <ul>
+            <li><a href="#all-medicines">All Medicines</a></li>
+            <li><a href="#wellness-offerings">Wellness Offerings</a></li>
+            <li><a href="#store-locator">Store Locator</a></li>
+            <li><a href="#whatsapp-connect">WhatsApp Connect</a></li>
+            <li><a href="#blogs">Blogs</a></li>
+        </ul>
+    </nav>
+    <nav class="category-tabs">
+        <ul>
+            <li><a href="#mom-baby">Mom & Baby</a></li>
+            <li><a href="#personal-care">Personal Care</a></li>
+            <li><a href="#health-fitness">Health & Fitness</a></li>
+            <li><a href="#elderly-care">Elderly Care</a></li>
+            <li><a href="#food-beverages">Food & Beverages</a></li>
+            <li><a href="#self-care">Self Care</a></li>
+            <li><a href="#pet-supplies">Pet Supplies</a></li>
+            <li><a href="#paper-wipes">Paper & Wipes</a></li>
+            <li><a href="#home-care">Home Care</a></li>
+            <li><a href="#sexual-solution">Sexual Solution</a></li>
+            <li><a href="#ortho-belts">Ortho Belts & Supports</a></li>
+            <li><a href="#mobility-rehab">Mobility & Rehab</a></li>
+        </ul>
+    </nav>
+    <div class="banner-slider">
+        <div class="banner-slide active">
+            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Offer 1">
+            <div class="banner-text">UPTO 50% OFF on Medicines!</div>
+        </div>
+        <div class="banner-slide">
+            <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=600&q=80" alt="Offer 2">
+            <div class="banner-text">Price Drop Alert! Save More!</div>
+        </div>
+        <div class="banner-slide">
+            <img src="https://images.unsplash.com/photo-1464306076886-debede6b2b24?auto=format&fit=crop&w=600&q=80" alt="Offer 3">
+            <div class="banner-text">Sip Smart Health Juices - Upto 33% OFF</div>
+        </div>
+        <button class="banner-arrow left" onclick="slideBanner(-1)">&#8592;</button>
+        <button class="banner-arrow right" onclick="slideBanner(1)">&#8594;</button>
+    </div>
+    <main>
+        <section id="home">
+            <h2 id="autoType"></h2>
+            <p id="autoTypeSub"></p>
+        </section>
+        <!-- Product upload removed from frontend as requested -->
+        <section id="products">
+            <h2>Trending Products</h2>
+            <div class="carousel-container">
+                <button id="carouselPrev" class="carousel-arrow-global carousel-arrow left">&#8592;</button>
+                <div class="carousel-track" id="carouselTrack">
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=120&q=80" alt="Kapiva Amla Juice" />
+                        <div class="product-info">
+                            <h3>Kapiva Amla Juice 1L</h3>
+                            <div class="product-price">
+                                <span class="price">₹252</span>
+                                <span class="discount">10% Off</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1519864600265-abb23847ef2c?auto=format&fit=crop&w=120&q=80" alt="Pampers Diaper" />
+                        <div class="product-info">
+                            <h3>Pampers Diaper Premium Care Pants L 44 Piece</h3>
+                            <div class="product-price">
+                                <span class="price">₹1405</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1464306076886-debede6b2b24?auto=format&fit=crop&w=120&q=80" alt="Horlicks Women's Plus" />
+                        <div class="product-info">
+                            <h3>Horlicks Women's Plus Caramel Jar 400g</h3>
+                            <div class="product-price">
+                                <span class="price">₹281</span>
+                                <span class="discount">11% Off</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=120&q=80" alt="PediaSure" />
+                        <div class="product-info">
+                            <h3>PediaSure Health And Nutrition Drink Powder</h3>
+                            <div class="product-price">
+                                <span class="price">₹1588</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=120&q=80" alt="Centrum Multivitamin" />
+                        <div class="product-info">
+                            <h3>Centrum Adults 50+ Multivitamin 50 Tablets</h3>
+                            <div class="product-price">
+                                <span class="price">₹617</span>
+                                <span class="discount">10% Off</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                    <div class="product-card">
+                        <img src="https://images.unsplash.com/photo-1465101046530-73398c7f28ca?auto=format&fit=crop&w=120&q=80" alt="Delight Nuts" />
+                        <div class="product-info">
+                            <h3>Delight Nuts Cashew Roasted & Salted 200g</h3>
+                            <div class="product-price">
+                                <span class="price">₹468</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    </div>
+                </div>
+                <button id="carouselNext" class="carousel-arrow-global carousel-arrow right">&#8594;</button>
+            </div>
+        </section>
+        <section id="concern">
+            <h2>Shop by Concern</h2>
+            <div class="carousel-container">
+                <button class="carousel-arrow left" onclick="slideCarousel('concernTrack',-1)">&#8592;</button>
+                <div class="carousel-track" id="concernTrack">
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/bone.png" alt="Bone Joint"><span>Bone Joint<br>Muscle Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/diabetes.png" alt="Diabetes Care"><span>Diabetes Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/eye.png" alt="Eye Care"><span>Eye Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/thermometer.png" alt="Fever Cough"><span>Fever Cough<br>Cold</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/hair.png" alt="Hair Care"><span>Hair Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/kidney.png" alt="Kidney Care"><span>Kidney Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/liver.png" alt="Liver Care"><span>Liver Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/pain.png" alt="Pain Relief"><span>Pain Relief</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/no-alcohol.png" alt="Quit Addiction"><span>Quit Addiction</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/lungs.png" alt="Respiratory"><span>Respiratory</span></div>
+                </div>
+                <button class="carousel-arrow right" onclick="slideCarousel('concernTrack',1)">&#8594;</button>
+            </div>
+        </section>
+        <section id="category">
+            <h2>Browse by category</h2>
+            <div class="carousel-container">
+                <button class="carousel-arrow left" onclick="slideCarousel('categoryTrack',-1)">&#8592;</button>
+                <div class="carousel-track" id="categoryTrack">
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/baby.png" alt="Baby Care"><span>Baby Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/medicine.png" alt="Medicines"><span>Medicines</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/vitamins.png" alt="Supplements"><span>Supplements</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/shampoo.png" alt="Personal Care"><span>Personal Care</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/health-graph.png" alt="Health Devices"><span>Health Devices</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/food.png" alt="Food & Beverages"><span>Food & Beverages</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/pet.png" alt="Pet Supplies"><span>Pet Supplies</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/toilet-paper.png" alt="Paper & Wipes"><span>Paper & Wipes</span></div>
+                </div>
+                <button class="carousel-arrow right" onclick="slideCarousel('categoryTrack',1)">&#8594;</button>
+            </div>
+        </section>
+        <section id="upcoming">
+            <h2>Upcoming Products</h2>
+            <div class="carousel-container">
+                <button class="carousel-arrow left" onclick="slideCarousel('upcomingTrack',-1)">&#8592;</button>
+                <div class="carousel-track" id="upcomingTrack">
+                    <div class="product-card"><h3>New Herbal Syrup</h3></div>
+                    <div class="product-card"><h3>Advanced Multivitamin</h3></div>
+                    <div class="product-card"><h3>Organic Protein Bar</h3></div>
+                    <div class="product-card"><h3>Kids Immunity Gummies</h3></div>
+                    <div class="product-card"><h3>Ayurvedic Shampoo</h3></div>
+                </div>
+                <button class="carousel-arrow right" onclick="slideCarousel('upcomingTrack',1)">&#8594;</button>
+            </div>
+        </section>
+        <section id="brands">
+            <h2>Shop by Brand Name</h2>
+            <div class="carousel-container">
+                <button class="carousel-arrow left" onclick="slideCarousel('brandTrack',-1)">&#8592;</button>
+                <div class="carousel-track" id="brandTrack">
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/abbott-laboratories.png" alt="Abbott"><span>Abbott</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/pfizer.png" alt="Pfizer"><span>Pfizer</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/johnson-and-johnson.png" alt="J&J"><span>J&J</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/novartis.png" alt="Novartis"><span>Novartis</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/roche.png" alt="Roche"><span>Roche</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/sanofi.png" alt="Sanofi"><span>Sanofi</span></div>
+                    <div class="icon-card"><img src="https://img.icons8.com/color/96/000000/gsk.png" alt="GSK"><span>GSK</span></div>
+                </div>
+                <button class="carousel-arrow right" onclick="slideCarousel('brandTrack',1)">&#8594;</button>
+            </div>
+        </section>
+        <section id="offers">
+            <h2>Dhamaka Offer</h2>
+            <div class="offer-tab">
+                <h3>Flat 50% Off on Select Products!</h3>
+                <p>Limited time offer. Hurry up and grab the best deals on Pharmida Healthcare!</p>
+            </div>
+            <!-- Offer Products section (new) -->
+            <div class="offer-products">
+                <h3>Hot Deal Products</h3>
+                <div class="carousel-container smooth-scroller" style="padding:8px 0;">
+                    <button id="offerPrev" class="carousel-arrow-global carousel-arrow left" style="float:left;margin-right:8px;">&#8592;</button>
+                    <div class="carousel-track" id="offerProductsTrack">
+                        <!-- JS will populate offer products here -->
+                    </div>
+                <button id="offerNext" class="carousel-arrow-global carousel-arrow right" style="float:right;margin-left:8px;">&#8594;</button>
+                </div>
+            </div>
+        </section>
+        <section id="about-pharmida">
+            <h2>🏥 About Pharmida Healthcare</h2>
+            <p>Pharmida Healthcare is a trusted name in medical and rehabilitation products across India. Our mission is simple: “Your Health is Our Mission.”<br>
+            We provide a wide range of rehabilitation, orthopedic, and healthcare products at unmatched discounts with 24x7 availability and free home delivery, making healthcare affordable and accessible to everyone.</p>
+            <h3>⭐ Key Features (Khaasiyat)</h3>
+            <ul>
+                <li>Higher Discounts – Up to 50% off on all rehab & ortho products.</li>
+                <li>24x7 Service – Order anytime, anywhere in India.</li>
+                <li>Free Home Delivery – No delivery charges across India.</li>
+                <li>Wide Product Range – Wheelchairs, walkers, hospital beds, braces, sanitary care & more.</li>
+                <li>Easy Online Shopping – Simple, fast, and secure checkout.</li>
+                <li>Trusted Quality – Genuine products with reliable after-sales support.</li>
+            </ul>
+            <h3>💪 Struggles We Solve</h3>
+            <ul>
+                <li>High cost of medical & rehab products → We offer budget-friendly pricing.</li>
+                <li>Limited availability in local stores → We ensure pan-India free delivery.</li>
+                <li>Urgent medical needs → 24/7 order support.</li>
+                <li>Lack of trust online → 100% genuine, quality-checked products.</li>
+            </ul>
+            <h3>🛠️ Our Services</h3>
+            <ul>
+                <li>Rehabilitation Products (wheelchairs, walkers, commode chairs, etc.)</li>
+                <li>Orthopedic Support (braces, supports, pillows, belts)</li>
+                <li>Hospital Equipment (beds, patient care items)</li>
+                <li>Personal Care & Sanitary Products</li>
+                <li>Customer Care 24x7 for orders & assistance</li>
+            </ul>
+            <h3>🌟 Advantages of Choosing Pharmida Healthcare</h3>
+            <ul>
+                <li>Affordable & discounted prices</li>
+                <li>Wide product availability</li>
+                <li>Free & fast delivery all over India</li>
+                <li>24x7 customer service</li>
+                <li>Hassle-free returns & exchanges</li>
+                <li>Secure payment (COD, UPI, Cards, Razorpay)</li>
+            </ul>
+            <h3>🏨 Facilities We Provide</h3>
+            <ul>
+                <li>Nationwide logistics for quick deliveries</li>
+                <li>Online consultation for product guidance</li>
+                <li>Easy-to-navigate eCommerce website</li>
+                <li>Regular offers & festive discounts</li>
+                <li>Doorstep delivery with safe packaging</li>
+            </ul>
+            <h3>❓ Frequently Asked Questions (FAQ)</h3>
+            <ul>
+                <li><strong>Q1. Do you provide delivery all over India?</strong><br>Yes, Pharmida Healthcare offers free home delivery across India.</li>
+                <li><strong>Q2. Are your products genuine?</strong><br>Absolutely. We supply 100% original and quality-checked products only.</li>
+                <li><strong>Q3. Do you offer Cash on Delivery (COD)?</strong><br>Yes, we provide COD as well as online payment options.</li>
+                <li><strong>Q4. Can I return or exchange products?</strong><br>Yes, products can be returned or exchanged as per our return policy.</li>
+                <li><strong>Q5. Do you operate 24x7?</strong><br>Yes, our website and customer support are available 24/7.</li>
+            </ul>
+        </section>
+        <!-- AI Scan Modal -->
+        <div id="aiScanModal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.6);z-index:9999;justify-content:center;align-items:center;">
+            <div style="background:#fff;padding:40px 30px;border-radius:16px;max-width:400px;text-align:center;position:relative;">
+                <h3>AI Prescription Scanning</h3>
+                <p>Your prescription is being scanned by our AI system. Please wait...</p>
+                <button onclick="document.getElementById('aiScanModal').style.display='none'" style="margin-top:20px;padding:10px 24px;font-size:1em;border-radius:8px;background:#4fd17c;color:#fff;border:none;">Close</button>
+            </div>
+        </div>
+        <script>
+            // Banner slider
+            let bannerIndex = 0;
+            function showBanner(idx) {
+                const slides = document.querySelectorAll('.banner-slide');
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === idx);
+                });
+            }
+            function slideBanner(dir) {
+                const slides = document.querySelectorAll('.banner-slide');
+                bannerIndex = (bannerIndex + dir + slides.length) % slides.length;
+                showBanner(bannerIndex);
+            }
+            setInterval(() => slideBanner(1), 3500);
+            showBanner(bannerIndex);
+
+            // Product carousel auto-slide for all carousels
+            function autoSlide(trackId) {
+                const track = document.getElementById(trackId);
+                if (!track) return;
+                let card = track.querySelector('.product-card') || track.querySelector('.icon-card');
+                if (!card) return;
+                const cardWidth = card.offsetWidth + 20;
+                let maxScroll = track.scrollWidth - track.offsetWidth;
+                let direction = 1;
+                let interval;
+                function startSliding() {
+                    interval = setInterval(() => {
+                        let scrollAmount = track.scrollLeft + direction * cardWidth;
+                        if (scrollAmount >= maxScroll) {
+                            direction = -1;
+                        } else if (scrollAmount <= 0) {
+                            direction = 1;
+                        }
+                        track.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+                    }, 1800);
+                }
+                function stopSliding() {
+                    clearInterval(interval);
+                }
+                track.addEventListener('mouseenter', stopSliding);
+                track.addEventListener('mouseleave', startSliding);
+                startSliding();
+            }
+            window.onload = function() {
+                autoSlide('carouselTrack'); // Trending Products
+                autoSlide('upcomingTrack'); // Upcoming Products
+                autoSlide('brandTrack');    // Shop by Brand Name
+                autoSlide('concernTrack');  // Shop by Concern
+                autoSlide('categoryTrack'); // Browse by Category
+            };
+            function slideCarousel(trackId, direction) {
+                const track = document.getElementById(trackId);
+                if (!track) return;
+                let card = track.querySelector('.product-card') || track.querySelector('.icon-card');
+                if (!card) return;
+                const cardWidth = card.offsetWidth + 20;
+                let scrollAmount = track.scrollLeft + direction * cardWidth * 2;
+                if (scrollAmount < 0) scrollAmount = 0;
+                if (scrollAmount > track.scrollWidth - track.offsetWidth) scrollAmount = track.scrollWidth - track.offsetWidth;
+                track.scrollTo({ left: scrollAmount, behavior: 'smooth' });
+            }
+            // Auto typing effect for welcome message
+            const autoTypeText = "Welcome to Pharmida Healthcare";
+            const autoTypeSubText = "We are dedicated to providing quality Pharmida solutions for you and your family.";
+            let i = 0, j = 0;
+            function typeMain() {
+                if (i < autoTypeText.length) {
+                    document.getElementById("autoType").textContent += autoTypeText.charAt(i);
+                    i++;
+                    setTimeout(typeMain, 60);
+                } else {
+                    typeSub();
+                }
+            }
+            function typeSub() {
+                if (j < autoTypeSubText.length) {
+                    document.getElementById("autoTypeSub").textContent += autoTypeSubText.charAt(j);
+                    j++;
+                    setTimeout(typeSub, 35);
+                }
+            }
+            // continuous smooth scroller using requestAnimationFrame
+            function createScroller(trackId, speed = 0.25) {
+                const container = document.getElementById(trackId).closest('.smooth-scroller') || document.getElementById(trackId).closest('.carousel-container');
+                const track = document.getElementById(trackId);
+                if (!track || !container) return null;
+
+                // duplicate children to create infinite loop effect
+                const items = Array.from(track.children);
+                if (items.length === 0) return null;
+                const wrapper = document.createElement('div');
+                wrapper.className = 'scroller-wrapper';
+
+                // move items into wrapper
+                items.forEach(it => wrapper.appendChild(it));
+                // clone once to allow seamless loop
+                items.forEach(it => wrapper.appendChild(it.cloneNode(true)));
+
+                // clear track and append wrapper
+                track.innerHTML = '';
+                track.appendChild(wrapper);
+
+                let rafId = null;
+                let paused = false;
+                let x = 0;
+
+                function step() {
+                    if (!paused) {
+                        x -= speed; // move left
+                        // reset when first half fully scrolled
+                        const resetAt = wrapper.scrollWidth / 2;
+                        if (Math.abs(x) >= resetAt) x = 0;
+                        wrapper.style.transform = `translateX(${x}px)`;
+                    }
+                    rafId = requestAnimationFrame(step);
+                }
+
+                container.addEventListener('mouseenter', () => { paused = true; });
+                container.addEventListener('mouseleave', () => { paused = false; });
+
+                step();
+                return () => { cancelAnimationFrame(rafId); };
+            }
+
+            window.onload = function() {
+                typeMain();
+                // keep other autoSlide behaviors for simpler lists
+                autoSlide('upcomingTrack'); // Upcoming Products
+                autoSlide('brandTrack');    // Shop by Brand Name
+                autoSlide('concernTrack');  // Shop by Concern
+                autoSlide('categoryTrack'); // Browse by Category
+            };
+        </script>
+    </main>
+    
+    <script>
+        // Upload form handling
+        async function loadProducts() {
+            try {
+                const res = await fetch('/api/products');
+                const data = await res.json();
+                if (!data.ok) return;
+                const track = document.getElementById('carouselTrack');
+                const offerTrack = document.getElementById('offerProductsTrack');
+                track.innerHTML = '';
+                if (offerTrack) offerTrack.innerHTML = '';
+                data.products.forEach(p => {
+                    const card = document.createElement('div');
+                    card.className = 'product-card';
+                    card.innerHTML = `
+                        <img src="${p.imageUrl}" alt="${escapeHtml(p.name)}" />
+                        <div class="product-info">
+                            <h3>${escapeHtml(p.name)}</h3>
+                            <div class="product-price">
+                                <span class="price">₹${Number(p.price).toFixed(2)}</span>
+                            </div>
+                            <button class="add-cart">Add to cart</button>
+                        </div>
+                    `;
+                    track.appendChild(card);
+                });
+
+                                // populate offer products (top 6)
+                if (offerTrack) {
+                    const top = data.products.slice(0, 6);
+                    top.forEach(p => {
+                        const discountLabel = p.discount || '';
+                        const card = document.createElement('div');
+                        card.className = 'product-card offer-product-card';
+                                                card.dataset.productId = p.id;
+                        card.dataset.productName = escapeHtml(p.name);
+                        card.dataset.productPrice = p.price;
+                        card.dataset.productImage = p.imageUrl;
+                        card.dataset.productDesc = escapeHtml(p.description || '');
+                        card.innerHTML = `
+                            <div class="offer-badge">🔥 HOT DEAL</div>
+                            <img src="${p.imageUrl}" alt="${escapeHtml(p.name)}" />
+                            <h3>${escapeHtml(p.name)}</h3>
+                            <div class="product-price">
+                                <span class="price">₹${Number(p.price).toFixed(0)}</span>
+                                ${discountLabel ? `<span class="discount">${escapeHtml(discountLabel)}</span>` : ''}
+                            </div>
+                            <div class="product-actions">
+                                <button class="add-cart-offer" onclick="addToCartFromOffer(event, ${p.id})">🛒 Add to Cart</button>
+                                <button class="buy-now-offer" onclick="buyNowFromOffer(event, ${p.id})">⚡ Buy Now</button>
+                            </div>
+                        `;
+                        offerTrack.appendChild(card);
+                    });
+                }
+            } catch (err) {
+                console.error('Failed to load products', err);
+            }
+        }
+
+        function escapeHtml(s) {
+            return String(s)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // initial load
+        loadProducts();
+
+                // after load, attach interactions: click -> modal, manual arrows, touch-swipe
+        function attachInteractions() {
+            // product click -> modal
+            document.querySelectorAll('#carouselTrack .product-card, #offerProductsTrack .product-card').forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // Don't open modal if clicking a button
+                    if (e.target.tagName === 'BUTTON') return;
+                    
+                    const img = card.querySelector('img');
+                    const title = card.querySelector('h3')?.textContent || '';
+                    const price = card.querySelector('.price')?.textContent || '';
+                    const description = card.dataset.productDesc || '';
+                    const productId = card.dataset.productId || null;
+                    showProductModal({ image: img?.src, title, price, description, productId });
+                });
+            });
+
+            // manual arrows
+            const carousel = document.getElementById('carouselTrack');
+            const offer = document.getElementById('offerProductsTrack');
+            if (document.getElementById('carouselPrev'))
+                document.getElementById('carouselPrev').addEventListener('click', () => manualScroll(carousel, 1));
+            if (document.getElementById('carouselNext'))
+                document.getElementById('carouselNext').addEventListener('click', () => manualScroll(carousel, -1));
+            if (document.getElementById('offerPrev'))
+                document.getElementById('offerPrev').addEventListener('click', () => manualScroll(offer, 1));
+            if (document.getElementById('offerNext'))
+                document.getElementById('offerNext').addEventListener('click', () => manualScroll(offer, -1));
+
+            // touch swipe
+            [carousel, offer].forEach(track => {
+                if (!track) return;
+                let startX = 0, currentX = 0, isDown = false;
+                track.addEventListener('touchstart', (ev) => { startX = ev.touches[0].clientX; isDown = true; });
+                track.addEventListener('touchmove', (ev) => {
+                    if (!isDown) return;
+                    currentX = ev.touches[0].clientX;
+                    const dx = startX - currentX;
+                    track.parentElement.scrollLeft += dx;
+                    startX = currentX;
+                });
+                track.addEventListener('touchend', () => { isDown = false; });
+            });
+
+            // Add to cart buttons
+            document.querySelectorAll('.add-cart').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const card = btn.closest('.product-card');
+                    if (!card) return;
+                    const name = card.querySelector('h3')?.textContent || 'Product';
+                    const img = card.querySelector('img')?.src || '';
+                    const priceText = card.querySelector('.price')?.textContent || '0';
+                    const price = Number(priceText.replace(/[^0-9.]/g, '')) || 0;
+                    const item = { name, image: img, price };
+                    const cart = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+                    cart.push(item);
+                    localStorage.setItem('pharm_cart', JSON.stringify(cart));
+                    // ensure cartId cookie exists
+                    function getCartId() {
+                        const name = 'pharm_cart_id=';
+                        const ca = document.cookie.split(';');
+                        for (let c of ca) { c=c.trim(); if (c.indexOf(name)===0) return c.substring(name.length); }
+                        const id = 'c_'+Math.random().toString(36).slice(2,10);
+                        document.cookie = `pharm_cart_id=${id}; path=/`;
+                        return id;
+                    }
+                    const cartId = getCartId();
+                    // sync with server
+                    try {
+                        await fetch('/api/cart', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ cartId, items: cart }) });
+                    } catch (err) { console.warn('Cart sync failed', err); }
+                    // small feedback
+                    btn.textContent = 'Added ✓';
+                    setTimeout(() => btn.textContent = 'Add to cart', 1200);
+                });
+            });
+        }
+
+        function manualScroll(trackElement, direction = 1) {
+            if (!trackElement) return;
+            const card = trackElement.querySelector('.product-card') || trackElement.querySelector('.icon-card');
+            if (!card) return;
+            const width = card.offsetWidth + 20;
+            trackElement.parentElement.scrollBy({ left: direction * width * 2, behavior: 'smooth' });
+        }
+
+                function showProductModal({ image, title, price, description, productId }) {
+            const backdrop = document.createElement('div');
+            backdrop.className = 'product-modal-backdrop';
+            backdrop.onclick = (e) => {
+                if (e.target === backdrop) document.body.removeChild(backdrop);
+            };
+            const modal = document.createElement('div');
+            modal.className = 'product-modal';
+            const priceNum = Number(String(price).replace(/[^0-9.]/g, ''));
+            modal.innerHTML = `
+                <button onclick="document.body.removeChild(this.closest('.product-modal-backdrop'))" style="position:absolute;top:10px;right:10px;background:none;border:none;font-size:24px;cursor:pointer;color:#666;">×</button>
+                <img src="${image || ''}" alt="${escapeHtml(title)}" />
+                <div class="meta">
+                    <h2>${escapeHtml(title)}</h2>
+                    <p class="price" style="font-size:1.8em;color:#206030;font-weight:700;margin:10px 0;">${escapeHtml(price)}</p>
+                    <p style="color:#666;line-height:1.6;">${escapeHtml(description || 'High quality product from Pharmida Healthcare')}</p>
+                    <div style="margin-top:24px;display:flex;gap:12px;">
+                        <button class="buy-btn" onclick="buyProductFromModal('${escapeHtml(title)}', ${priceNum}, '${image}')">⚡ Buy Now</button>
+                        <button onclick="addProductToCartFromModal('${escapeHtml(title)}', ${priceNum}, '${image}'); this.textContent='Added ✓'; this.style.background='#00aa00';" style="padding:10px 20px;background:#4fd17c;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:600;">🛒 Add to Cart</button>
+                    </div>
+                </div>
+            `;
+            backdrop.appendChild(modal);
+            document.body.appendChild(backdrop);
+        }
+        
+        // Buy Now from offer card
+        function buyNowFromOffer(event, productId) {
+            event.stopPropagation();
+            const card = event.target.closest('.product-card');
+            const name = card.dataset.productName;
+            const price = Number(card.dataset.productPrice);
+            const image = card.dataset.productImage;
+            
+            // Add to cart
+            const item = { name, price, image };
+            const cart = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+            cart.push(item);
+            localStorage.setItem('pharm_cart', JSON.stringify(cart));
+            
+            // Redirect to checkout
+            window.location.href = '/payment.html';
+        }
+        
+        // Add to cart from offer card
+        function addToCartFromOffer(event, productId) {
+            event.stopPropagation();
+            const card = event.target.closest('.product-card');
+            const name = card.dataset.productName;
+            const price = Number(card.dataset.productPrice);
+            const image = card.dataset.productImage;
+            
+            const item = { name, price, image };
+            const cart = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+            cart.push(item);
+            localStorage.setItem('pharm_cart', JSON.stringify(cart));
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Added!';
+            btn.style.background = '#00aa00';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+            }, 2000);
+        }
+        
+        // Buy product from modal
+        function buyProductFromModal(name, price, image) {
+            const item = { name, price, image };
+            const cart = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+            cart.push(item);
+            localStorage.setItem('pharm_cart', JSON.stringify(cart));
+            window.location.href = '/payment.html';
+        }
+        
+        // Add to cart from modal
+        function addProductToCartFromModal(name, price, image) {
+            const item = { name, price, image };
+            const cart = JSON.parse(localStorage.getItem('pharm_cart') || '[]');
+            cart.push(item);
+            localStorage.setItem('pharm_cart', JSON.stringify(cart));
+        }
+
+        // After products are loaded, initialize all carousels and interactions
+        function initAllCarousels() {
+            const tracks = ['carouselTrack','offerProductsTrack','brandTrack','concernTrack','categoryTrack','upcomingTrack'];
+            tracks.forEach(id => {
+                const track = document.getElementById(id);
+                if (!track) return;
+                // ensure parent has smooth-scroller class for seamless scrollers
+                const parent = track.closest('.carousel-container');
+                if (parent) parent.classList.add('smooth-scroller');
+                // add arrows if not present
+                if (!parent.querySelector('.carousel-arrow-global')) {
+                    const prev = document.createElement('button');
+                    prev.className = 'carousel-arrow-global';
+                    prev.innerHTML = '&#8592;';
+                    prev.addEventListener('click', () => manualScroll(track, 1));
+                    const next = document.createElement('button');
+                    next.className = 'carousel-arrow-global';
+                    next.innerHTML = '&#8594;';
+                    next.addEventListener('click', () => manualScroll(track, -1));
+                    parent.insertBefore(prev, parent.firstChild);
+                    parent.appendChild(next);
+                }
+                                // initialize scroller; for smaller icon tracks, slower speed
+                // Offer products track gets faster auto-scroll
+                const speed = (id === 'offerProductsTrack') ? 0.8 : (id === 'carouselTrack' ? 0.6 : 0.25);
+                createScroller(id, speed);
+            });
+
+            // attach interactions (modal, touch handlers, etc.)
+            attachInteractions();
+        }
+
+        // Poll until products exist then init carousels
+        const _attachInterval = setInterval(() => {
+            const carousel = document.getElementById('carouselTrack');
+            if (carousel && carousel.children.length > 0) {
+                initAllCarousels();
+                clearInterval(_attachInterval);
+            }
+        }, 250);
+
+        // SSE: listen for product changes to auto-refresh
+        try {
+            const evtSource = new EventSource('/events');
+            evtSource.onmessage = (e) => {
+                try {
+                    const obj = JSON.parse(e.data);
+                    if (obj && (obj.type === 'product_added' || obj.type === 'product_updated' || obj.type === 'product_deleted')) {
+                        // refresh products and re-init carousels
+                        loadProducts().then(() => {
+                            // small timeout to allow DOM updates
+                            setTimeout(() => { initAllCarousels(); }, 300);
+                        });
+                    }
+                } catch (err) { console.error('SSE parse error', err); }
+            };
+        } catch (err) {
+            console.warn('SSE not supported or connection failed', err);
+        }
+    </script>
+    <footer style="background:#2d3748;color:#fff;padding:40px 0 0 0;">
+    <div style="background:#4a5568;padding:24px 0;text-align:center;display:flex;justify-content:space-around;align-items:center;">
+        <div><span style="font-size:1.1em;">🚚 Priority Delivery</span></div>
+        <div><span style="font-size:1.1em;">📍 Live Track Orders</span></div>
+        <div><span style="font-size:1.1em;">💳 Earn Wallet Points</span></div>
+        <div><span style="font-size:1.1em;">🔒 Secure Payments</span></div>
+    </div>
+    <div style="padding:40px 0 0 0;display:flex;flex-wrap:wrap;justify-content:space-around;align-items:flex-start;">
+        <div style="flex:1;min-width:220px;">
+            <h3 style="color:#fff;">Follow us</h3>
+            <div style="display:flex;gap:16px;">
+                <a href="https://facebook.com/pharmidahealthcare" style="color:#fff;" target="_blank"><img src="assets/social-facebook.svg" alt="Facebook" style="width:32px;"></a>
+                <a href="https://instagram.com/pharmidahealthcare" style="color:#fff;" target="_blank"><img src="assets/social-instagram.svg" alt="Instagram" style="width:32px;"></a>
+                <a href="https://twitter.com/pharmidahealthcare" style="color:#fff;" target="_blank"><img src="assets/social-twitter.svg" alt="Twitter" style="width:32px;"></a>
+                <a href="https://linkedin.com/company/pharmidahealthcare" style="color:#fff;" target="_blank"><img src="assets/social-linkedin.svg" alt="LinkedIn" style="width:32px;"></a>
+                <a href="https://youtube.com/pharmidahealthcare" style="color:#fff;" target="_blank"><img src="assets/social-youtube.svg" alt="YouTube" style="width:32px;"></a>
+            </div>
+        </div>
+        <div style="flex:1;min-width:220px;">
+            <h3 style="color:#fff;">Categories</h3>
+            <ul style="list-style:none;padding:0;">
+                <li><a href="#mom-baby" style="color:#4fd17c;">Mom & Baby</a></li>
+                <li><a href="#personal-care" style="color:#4fd17c;">Personal Care</a></li>
+                <li><a href="#health-fitness" style="color:#4fd17c;">Health & Fitness</a></li>
+                <li><a href="#elderly-care" style="color:#4fd17c;">Elderly Care</a></li>
+                <li><a href="#food-beverages" style="color:#4fd17c;">Food & Beverages</a></li>
+                <li><a href="#self-care" style="color:#4fd17c;">Self Medication</a></li>
+                <li><a href="#paper-wipes" style="color:#4fd17c;">Paper & Wipes</a></li>
+                <li><a href="#pet-supplies" style="color:#4fd17c;">Pet Supplies</a></li>
+                <li><a href="#home-care" style="color:#4fd17c;">Home Care</a></li>
+                <li><a href="#sexual-solution" style="color:#4fd17c;">Sexual Solution</a></li>
+                <li><a href="#ortho-belts" style="color:#4fd17c;">Ortho Belts & Supports</a></li>
+            </ul>
+        </div>
+        <div style="flex:1;min-width:220px;">
+            <h3 style="color:#fff;">Medicines</h3>
+            <ul style="list-style:none;padding:0;">
+                <li><a href="/medicines" style="color:#4fd17c;">Buy Medicines</a></li>
+                <li><a href="/upload-note" style="color:#4fd17c;">Upload Note</a></li>
+            </ul>
+        </div>
+        <div style="flex:1;min-width:220px;">
+            <h3 style="color:#fff;">Others</h3>
+            <ul style="list-style:none;padding:0;">
+                <li><a href="/offers" style="color:#4fd17c;">Offers</a></li>
+                <li><a href="/blogs" style="color:#4fd17c;">Blogs</a></li>
+                <li><a href="/terms" style="color:#4fd17c;">Terms & Conditions</a></li>
+                <li><a href="/privacy" style="color:#4fd17c;">Privacy Policy</a></li>
+                <li><a href="/stores" style="color:#4fd17c;">Store Locator</a></li>
+            </ul>
+        </div>
+        <div style="flex:1;min-width:220px;">
+            <h3 style="color:#fff;">Download the Mobile app</h3>
+            <div style="display:flex;gap:12px;">
+                <a href="https://play.google.com/store/apps/details?id=com.pharmidahealthcare" target="_blank" style="color:#4fd17c;font-weight:600;">Google Play</a>
+                <a href="https://apps.apple.com/in/app/pharmidahealthcare/id123456789" target="_blank" style="color:#4fd17c;font-weight:600;">App Store</a>
+            </div>
+            <div style="margin-top:18px;">
+                <span style="display:block;margin-bottom:8px;">📧 Email: <a href="mailto:support@pharmidahealthcare.com" style="color:#4fd17c;">support@pharmidahealthcare.com</a></span>
+                <span style="display:block;margin-bottom:8px;">📞 Contact: <a href="tel:7304022366" style="color:#4fd17c;">7304022366</a>, <a href="tel:7900082808" style="color:#4fd17c;">7900082808</a></span>
+            </div>
+        </div>
+    </div>
+    <div style="padding:32px 0 0 0;display:flex;justify-content:space-between;align-items:center;color:#cbd5e1;font-size:1em;">
+        <span style="margin-left:24px;">Copyright Pharmida Healthcare 2025. All rights reserved.</span>
+        <span style="margin-right:24px;">Developed by Saurabh Mishra</span>
+    </div>
+</footer>
+</body>
+</html>

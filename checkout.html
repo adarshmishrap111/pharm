@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+    <main>
+        <h2>Checkout</h2>
+        <div id="cartArea">Loading cart...</div>
+        <form id="checkoutForm" style="margin-top:18px;">
+            <input type="text" name="address" placeholder="Delivery Address" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"><br><br>
+            <input type="text" name="payment" placeholder="Payment Method (COD/UPI/Card)" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;"><br><br>
+            <button type="submit">Place Order</button>
+        </form>
+    </main>
+    <script>
+        function getCartId() {
+            const name = 'pharm_cart_id=';
+            const ca = document.cookie.split(';');
+            for (let c of ca) { c=c.trim(); if (c.indexOf(name)===0) return c.substring(name.length); }
+            // generate
+            const id = 'c_'+Math.random().toString(36).slice(2,10);
+            document.cookie = `pharm_cart_id=${id}; path=/`;
+            return id;
+        }
+
+        async function loadServerCart() {
+            const id = getCartId();
+            // sync local to server
+            const local = JSON.parse(localStorage.getItem('pharm_cart')||'[]');
+            if (local.length) await fetch('/api/cart', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ cartId: id, items: local }) });
+            const res = await fetch('/api/cart/'+id);
+            const data = await res.json();
+            const items = data.items || [];
+            const area = document.getElementById('cartArea');
+            if (!items.length) { area.innerHTML = '<p>No items in cart.</p>'; return; }
+            let html = '<ul>';
+            let total = 0;
+            items.forEach(it=>{ total += Number(it.price||0); html += `<li>${it.name} - ₹${Number(it.price).toFixed(2)}</li>`; });
+            html += `</ul><div><strong>Total: ₹${total.toFixed(2)}</strong></div>`;
+            area.innerHTML = html;
+        }
+
+                document.getElementById('checkoutForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            // Redirect to payment page instead of direct checkout
+            window.location.href = '/payment.html';
+        });
+
+        loadServerCart();
+    </script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Prescription - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+        <main style="max-width:700px;margin:40px auto;padding:20px;">
+        <h2>Upload Prescription</h2>
+        <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+            <p style="color:#666;margin-bottom:20px;">Upload your prescription and we'll process it within 24 hours. Accepted formats: JPG, PNG, PDF (Max 5MB)</p>
+            <form id="prescriptionForm" enctype="multipart/form-data">
+                <label>Choose Prescription File</label><br>
+                <input type="file" name="prescription" accept="image/*,application/pdf" required style="margin:10px 0 20px 0;"><br>
+                <label>Additional Notes (Optional)</label><br>
+                <textarea name="notes" placeholder="Any special instructions..." style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;" rows="3"></textarea><br>
+                <button type="submit" id="uploadBtn" style="background:#4fd17c;color:#fff;padding:12px 24px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Upload Prescription</button>
+                <span id="status" style="margin-left:12px;font-weight:600;"></span>
+            </form>
+            <div id="result" style="margin-top:20px;"></div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('prescriptionForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            const btn = document.getElementById('uploadBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Uploading...';
+            status.textContent = '';
+            result.innerHTML = '';
+            
+            const fd = new FormData(e.target);
+            const userId = localStorage.getItem('user_email') || 'guest';
+            fd.append('userId', userId);
+            
+            try {
+                const res = await fetch('/api/prescriptions', {
+                    method: 'POST',
+                    body: fd
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    status.textContent = 'Uploaded successfully!';
+                    status.style.color = '#00aa00';
+                    result.innerHTML = `
+                        <div style="background:#e6ffe6;padding:16px;border-radius:8px;margin-top:16px;">
+                            <h3 style="margin:0 0 8px 0;color:#00aa00;">✓ Prescription Uploaded</h3>
+                            <p style="margin:0;">ID: ${data.prescription.id}</p>
+                            <p style="margin:0;">Status: <strong>${data.prescription.status}</strong></p>
+                            <p style="margin:4px 0 0 0;">We'll review your prescription and contact you soon.</p>
+                        </div>
+                    `;
+                    e.target.reset();
+                } else {
+                    status.textContent = data.error || 'Upload failed';
+                    status.style.color = '#ff0000';
+                }
+            } catch (err) {
+                status.textContent = 'Network error';
+                status.style.color = '#ff0000';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Upload Prescription';
+            }
+        };
+    </script>
+</body>
+</html>

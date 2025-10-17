@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Doctor on Call - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">Home</a></li>
+            <li><a href="cart.html" style="color:#fff;font-weight:600;text-decoration:none;">Cart</a></li>
+            <li><a href="profile.html" style="color:#fff;font-weight:600;text-decoration:none;">Profile</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
+            <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
+            <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
+            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
+            <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
+        </ul>
+    </nav>
+        <main style="max-width:700px;margin:40px auto;padding:20px;">
+        <h2>👨‍⚕️ Doctor on Call Service</h2>
+        <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
+            <div style="background:#e6f2ff;border-left:4px solid #2196f3;padding:16px;margin-bottom:20px;border-radius:6px;">
+                <strong style="color:#2196f3;">📞 24/7 Doctor Consultation:</strong>
+                <p style="margin:8px 0 0 0;">Connect with qualified doctors anytime. Call directly or book an appointment below.</p>
+            </div>
+            
+            <div style="margin-bottom:30px;text-align:center;">
+                <a href="tel:7304022366"><button style="background:#2196f3;color:#fff;font-size:1.3em;padding:16px 40px;border-radius:10px;border:none;cursor:pointer;box-shadow:0 4px 12px rgba(33,150,243,0.3);">👨‍⚕️ Call Doctor Now</button></a>
+                <p style="margin:8px 0 0 0;color:#666;">Phone: <strong>7304022366</strong></p>
+            </div>
+            
+            <hr style="border:none;border-top:1px solid #eee;margin:30px 0;">
+            
+            <h3>Book Doctor Appointment</h3>
+            <p style="color:#666;margin-bottom:20px;">Schedule a consultation and our doctor will call you at your preferred time.</p>
+            
+            <form id="doctorForm">
+                <label>Full Name *</label><br>
+                <input type="text" name="name" placeholder="Your Name" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;"><br>
+                
+                <label>Contact Number *</label><br>
+                <input type="tel" name="phone" placeholder="Phone Number" required style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;"><br>
+                
+                <label>Health Issue / Symptoms</label><br>
+                <textarea name="issue" placeholder="Describe your symptoms..." style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;" rows="3"></textarea><br>
+                
+                <label>Preferred Time</label><br>
+                <select name="preferredTime" style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;">
+                    <option value="ASAP">As Soon As Possible</option>
+                    <option value="Morning (9AM-12PM)">Morning (9AM-12PM)</option>
+                    <option value="Afternoon (12PM-4PM)">Afternoon (12PM-4PM)</option>
+                    <option value="Evening (4PM-8PM)">Evening (4PM-8PM)</option>
+                    <option value="Night (8PM-11PM)">Night (8PM-11PM)</option>
+                </select><br>
+                
+                <button type="submit" id="submitBtn" style="background:#2196f3;color:#fff;padding:12px 24px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">📞 Book Appointment</button>
+                <span id="status" style="margin-left:12px;font-weight:600;"></span>
+            </form>
+            <div id="result" style="margin-top:20px;"></div>
+        </div>
+    </main>
+    <script>
+        document.getElementById('doctorForm').onsubmit = async function(e) {
+            e.preventDefault();
+            const status = document.getElementById('status');
+            const btn = document.getElementById('submitBtn');
+            const result = document.getElementById('result');
+            
+            btn.disabled = true;
+            btn.textContent = 'Booking...';
+            status.textContent = '';
+            result.innerHTML = '';
+            
+            const formData = {
+                name: e.target.name.value,
+                phone: e.target.phone.value,
+                issue: e.target.issue.value,
+                preferredTime: e.target.preferredTime.value
+            };
+            
+            try {
+                const res = await fetch('/api/doctor', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const data = await res.json();
+                
+                if (res.ok) {
+                    status.textContent = 'Appointment booked!';
+                    status.style.color = '#00aa00';
+                    result.innerHTML = `
+                        <div style="background:#e6ffe6;padding:20px;border-radius:8px;margin-top:16px;">
+                            <h3 style="margin:0 0 8px 0;color:#00aa00;">✓ Appointment Confirmed</h3>
+                            <p style="margin:0;">Appointment ID: <strong>${data.appointment.id}</strong></p>
+                            <p style="margin:8px 0 0 0;">Our doctor will call you at: <strong>${data.appointment.preferredTime}</strong></p>
+                            <p style="margin:8px 0 0 0;font-size:0.9em;color:#666;">Status: <strong>${data.appointment.status}</strong></p>
+                        </div>
+                    `;
+                    e.target.reset();
+                } else {
+                    status.textContent = data.error || 'Booking failed';
+                    status.style.color = '#ff0000';
+                }
+            } catch (err) {
+                status.textContent = 'Network error';
+                status.style.color = '#ff0000';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📞 Book Appointment';
+            }
+        };
+    </script>
+</body>
+</html>
