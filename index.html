@@ -827,5 +827,14 @@
         <span style="margin-right:24px;">Developed by Saurabh Mishra</span>
     </div>
 </footer>
+<script>
+  // Logout functionality
+  document.getElementById('logout').addEventListener('click', () => {
+    // Clear user data and redirect to login
+    localStorage.removeItem('user_name');
+    localStorage.removeItem('user_email');
+    window.location.href = 'login.html';
+  });
+</script>
 </body>
 </html>

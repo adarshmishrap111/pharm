@@ -1,0 +1,9 @@
+{
+  "welcome": "Welcome",
+  "dashboard": "Dashboard",
+  "products": "Products",
+  "orders": "Orders",
+  "users": "Users",
+  "reports": "Reports",
+  "logout": "Logout"
+}

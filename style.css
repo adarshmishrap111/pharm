@@ -550,6 +550,35 @@ footer {
     color: #fff;
 }
 
+.tabs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin: 20px auto;
+}
+
+.tab {
+  padding: 8px 16px;
+  background: #e0e0e0;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9em;
+  font-weight: bold;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.tab:hover {
+  background: #d4d4d4;
+  transform: scale(1.05);
+}
+
+.tab.active {
+  background: #4fd17c;
+  color: white;
+}
+
 /* News Bar */
 .news-bar {
     background: #17613e !important;
@@ -627,7 +656,7 @@ footer {
     box-shadow: 0 2px 8px rgba(32,96,48,0.07);
 }
 .header-icon:hover {
-    background: #4fd17c;
+   
     color: #fff;
     box-shadow: 0 4px 16px rgba(32,96,48,0.12);
 }

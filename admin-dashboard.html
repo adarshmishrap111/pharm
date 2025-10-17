@@ -1,5 +1,3 @@
-
-
 <!doctype html>
 <html>
 <head>
@@ -9,8 +7,8 @@
   <style>
     .dashboard-container { max-width: 1400px; margin: 24px auto; padding: 20px; }
     .dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-    .tabs { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-    .tab { padding: 12px 24px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 24px; justify-content: center; flex-wrap: wrap; }
+    .tab { padding: 10px 20px; background: #f0f0f0; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; }
     .tab.active { background: #4fd17c; color: #fff; }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
@@ -71,15 +69,22 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <button class="tab active" onclick="showTab('orders')">Orders</button>
+      <button class="tab active" onclick="showTab('dashboard')">Dashboard</button>
+      <button class="tab" onclick="showTab('orders')">Orders</button>
       <button class="tab" onclick="showTab('profiles')">User Profiles</button>
       <button class="tab" onclick="showTab('prescriptions')">Prescriptions</button>
       <button class="tab" onclick="showTab('ambulance')">Ambulance Requests</button>
       <button class="tab" onclick="showTab('doctor')">Doctor Appointments</button>
     </div>
 
+    <!-- Dashboard Tab -->
+    <div id="dashboard" class="tab-content active">
+      <h2>Welcome to the Admin Dashboard</h2>
+      <p>Use the navigation tabs to manage orders, users, prescriptions, ambulance requests, and doctor appointments.</p>
+    </div>
+
     <!-- Orders Tab -->
-    <div id="orders" class="tab-content active">
+    <div id="orders" class="tab-content">
       <h2>All Orders</h2>
       <table class="data-table" id="ordersTable">
         <thead>
