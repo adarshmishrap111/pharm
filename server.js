@@ -47,6 +47,14 @@ async function sendEmail(to, subject, html) {
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Redirect root domain (non-www) to www
+app.use((req, res, next) => {
+  if (req.hostname === "pharmidahealthcare.com") {
+    return res.redirect(301, "https://www.pharmidahealthcare.com" + req.url);
+  }
+  next();
+});
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -1004,14 +1012,6 @@ app.get('/api/payments', requireAdmin, async (req, res) => {
 app.use((req, res, next) => {
   if (req.headers["x-forwarded-proto"] !== "https") {
     return res.redirect("https://" + req.headers.host + req.url);
-  }
-  next();
-});
-
-// Redirect root domain (non-www) to www
-app.use((req, res, next) => {
-  if (req.hostname === "pharmidahealthcare.com") {
-    return res.redirect(301, "https://www.pharmidahealthcare.com" + req.url);
   }
   next();
 });
