@@ -51,19 +51,44 @@ async function sendEmail(to, subject, html) {
 // Initialize environment variables
 dotenv.config();
 
-// Initialize Firebase Admin SDK (DISABLED FOR LOCAL DEVELOPMENT)
-// const serviceAccount = require('./firebase-adminsdk.json'); 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   storageBucket: "pharmida-healthcare.appspot.com",
-// });
+// Initialize Firebase Admin SDK (use env var or local file)
+let firestoreDb = null;
+try {
+  // Prefer JSON from environment for production (set FIREBASE_ADMIN_JSON)
+  const serviceAccount = process.env.FIREBASE_ADMIN_JSON
+    ? JSON.parse(process.env.FIREBASE_ADMIN_JSON)
+    : require('./firebase-adminsdk.json');
 
-// const firestoreDb = admin.firestore(); // DISABLED FOR LOCAL DEVELOPMENT
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'pharmida-healthcare.appspot.com',
+  });
+
+  firestoreDb = admin.firestore();
+  console.log('✅ Firebase Admin initialized');
+} catch (err) {
+  // Not fatal for local dev - server will still run using SQLite fallbacks
+  console.warn('⚠️ Firebase Admin not initialized:', err && err.message ? err.message : err);
+}
 const app = express();
 const PORT = process.env.PORT || 3000; // Changed to 3000 for local development
 
+// CORS Configuration for Frontend Domain
+const corsOptions = {
+  origin: [
+    'https://www.pharmidahealthcare.com',
+    'https://pharmidahealthcare.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-secret', 'x-admin-token']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Redirect root domain (non-www) to www
@@ -74,7 +99,15 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+// CORS configuration for production domain
+app.use(cors({
+  origin: [
+    'https://www.pharmidahealthcare.com',
+    'https://pharmidahealthcare.com',
+    'http://localhost:3000'  // for local development
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
