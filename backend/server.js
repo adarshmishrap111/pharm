@@ -2,6 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const dotenv = require('dotenv');
 const admin = require('firebase-admin');
 const multer = require('multer');
@@ -51,19 +52,44 @@ async function sendEmail(to, subject, html) {
 // Initialize environment variables
 dotenv.config();
 
-// Initialize Firebase Admin SDK (DISABLED FOR LOCAL DEVELOPMENT)
-// const serviceAccount = require('./firebase-adminsdk.json'); 
-// admin.initializeApp({
-//   credential: admin.credential.cert(serviceAccount),
-//   storageBucket: "pharmida-healthcare.appspot.com",
-// });
+// Initialize Firebase Admin SDK (use env var or local file)
+let firestoreDb = null;
+try {
+  // Prefer JSON from environment for production (set FIREBASE_ADMIN_JSON)
+  const serviceAccount = process.env.FIREBASE_ADMIN_JSON
+    ? JSON.parse(process.env.FIREBASE_ADMIN_JSON)
+    : require('./firebase-adminsdk.json');
 
-// const firestoreDb = admin.firestore(); // DISABLED FOR LOCAL DEVELOPMENT
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'pharmida-healthcare.appspot.com',
+  });
+
+  firestoreDb = admin.firestore();
+  console.log('✅ Firebase Admin initialized');
+} catch (err) {
+  // Not fatal for local dev - server will still run using SQLite fallbacks
+  console.warn('⚠️ Firebase Admin not initialized:', err && err.message ? err.message : err);
+}
 const app = express();
 const PORT = process.env.PORT || 3000; // Changed to 3000 for local development
 
+// CORS Configuration for Frontend Domain
+const corsOptions = {
+  origin: [
+    'https://www.pharmidahealthcare.com',
+    'https://pharmidahealthcare.com',
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-admin-secret', 'x-admin-token']
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 // Redirect root domain (non-www) to www
@@ -74,16 +100,66 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use(cors());
+// CORS configuration for production domain
+app.use(cors({
+  origin: [
+    'https://www.pharmidahealthcare.com',
+    'https://pharmidahealthcare.com',
+    'http://localhost:3000'  // for local development
+  ],
+  credentials: true
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser()); // Add cookie parser middleware
+
+// Admin Authentication Middleware for Protected Pages
+function protectAdminPages(req, res, next) {
+  const url = req.url;
+  
+  // List of admin-only pages that should be protected
+  const adminPages = [
+    '/admin-dashboard.html',
+    '/admin-dashboard-new.html', 
+    '/admin-debug.html',
+    '/product-upload.html',
+    '/super-admin.html',
+    '/admin-edit.html'
+  ];
+  
+  // Check if current request is for an admin page
+  const isAdminPage = adminPages.some(page => url.includes(page));
+  
+  if (isAdminPage) {
+    // Check if user has admin session
+    const token = req.cookies?.adminToken || req.headers.authorization?.replace('Bearer ', '');
+    
+    if (!token) {
+      // Redirect to admin login page
+      return res.redirect('/admin-login.html?error=unauthorized&redirect=' + encodeURIComponent(url));
+    }
+    
+    try {
+      jwt.verify(token, JWT_SECRET);
+      next(); // Admin is authenticated, allow access
+    } catch (err) {
+      // Invalid token, redirect to login
+      return res.redirect('/admin-login.html?error=invalid_token&redirect=' + encodeURIComponent(url));
+    }
+  } else {
+    next(); // Not an admin page, allow access
+  }
+}
+
+// Apply admin protection middleware BEFORE serving static files
+app.use(protectAdminPages);
 
 // Serve static files (your frontend) and uploaded images
-app.use(express.static(path.join(__dirname)));
-app.use('/uploads', express.static(path.join(__dirname, 'assets', 'uploads')));
+app.use(express.static(path.join(__dirname, '..', 'frontend')));
+app.use('/uploads', express.static(path.join(__dirname, '..', 'frontend', 'assets', 'uploads')));
 
 // Ensure uploads folder exists
-const uploadsDir = path.join(__dirname, 'assets', 'uploads');
+const uploadsDir = path.join(__dirname, '..', 'frontend', 'assets', 'uploads');
 
 async function ensureUploadsDir() {
   try {
@@ -462,25 +538,49 @@ app.post('/api/login', async (req, res) => {
   try {
     const { password } = req.body;
     const secret = process.env.ADMIN_PASSWORD || 'admin123';
-    if (!password || password !== secret) return res.status(401).json({ error: 'Invalid credentials' });
-    const sess = await createSession(12);
-    // set HttpOnly cookie
-    res.setHeader('Set-Cookie', `admin_token=${sess.token}; HttpOnly; Path=/; Max-Age=${12 * 60 * 60}`);
-    res.json({ ok: true });
+    
+    if (!password || password !== secret) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    // Create JWT token for admin
+    const token = jwt.sign(
+      { admin: true, timestamp: Date.now() },
+      JWT_SECRET,
+      { expiresIn: '24h' }
+    );
+    
+    // Set both cookie (for page protection) and return token (for API calls)
+    res.cookie('adminToken', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    });
+    
+    res.json({ 
+      ok: true, 
+      token: token,
+      message: 'Login successful' 
+    });
+    
   } catch (err) {
     console.error('Login error', err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
 
-// logout: clears token cookie and removes session
+// logout: clears token cookie
 app.post('/api/logout', async (req, res) => {
   try {
-    const token = req.cookies && req.cookies.admin_token;
-    if (token) await db.run('DELETE FROM sessions WHERE token = ?', token).catch(() => {});
-    // clear cookie
-    res.setHeader('Set-Cookie', 'admin_token=; HttpOnly; Path=/; Max-Age=0');
-    res.json({ ok: true });
+    // Clear the admin token cookie
+    res.clearCookie('adminToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict'
+    });
+    
+    res.json({ ok: true, message: 'Logged out successfully' });
   } catch (err) {
     console.error('Logout error', err);
     res.status(500).json({ error: 'Internal server error' });
@@ -519,7 +619,7 @@ app.put('/api/products/:id', requireAdmin, upload.single('productImage'), async 
     let imageUrl = product.imageUrl;
     if (req.file) {
       // remove old file
-      const oldPath = path.join(__dirname, product.imageUrl || '');
+      const oldPath = path.join(__dirname, '..', 'frontend', product.imageUrl || '');
       if (product.imageUrl) await fs.unlink(oldPath).catch(() => {});
       imageUrl = `/uploads/${req.file.filename}`;
     }
@@ -542,7 +642,7 @@ app.delete('/api/products/:id', requireAdmin, async (req, res) => {
     const product = await db.get('SELECT * FROM products WHERE id = ?', id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
     if (product.imageUrl) {
-      const filePath = path.join(__dirname, product.imageUrl);
+      const filePath = path.join(__dirname, '..', 'frontend', product.imageUrl);
       await fs.unlink(filePath).catch(() => {});
     }
     await db.run('DELETE FROM products WHERE id = ?', id);
@@ -649,6 +749,27 @@ app.put('/api/prescriptions/:id', requireAdmin, async (req, res) => {
     await db.run('UPDATE prescriptions SET status=?, notes=? WHERE id=?', status, notes, req.params.id);
     const prescription = await db.get('SELECT * FROM prescriptions WHERE id = ?', req.params.id);
     res.json({ ok: true, prescription });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Delete Prescription (Admin)
+app.delete('/api/prescriptions/:id', requireAdmin, async (req, res) => {
+  try {
+    const prescription = await db.get('SELECT * FROM prescriptions WHERE id = ?', req.params.id);
+    if (!prescription) return res.status(404).json({ error: 'Prescription not found' });
+    
+    // Delete the file
+    if (prescription.fileUrl) {
+      const filePath = path.join(__dirname, '..', 'frontend', prescription.fileUrl);
+      await fs.unlink(filePath).catch(() => {});
+    }
+    
+    // Delete from database
+    await db.run('DELETE FROM prescriptions WHERE id = ?', req.params.id);
+    res.json({ ok: true });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });

@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  pharmida-app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - ADMIN_PASSWORD=your-secure-admin-password
+      - JWT_SECRET=your-very-long-jwt-secret-key-minimum-32-characters
+      # Uncomment and configure these for full functionality
+      # - RAZORPAY_KEY_ID=rzp_live_xxxxxxxxxx
+      # - RAZORPAY_KEY_SECRET=your_razorpay_secret
+      # - EMAIL_USER=noreply@yourdomain.com
+      # - EMAIL_PASS=your_app_specific_password
+    volumes:
+      - pharmida_uploads:/app/frontend/assets/uploads
+      - pharmida_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Add Nginx reverse proxy for production
+  # nginx:
+  #   image: nginx:alpine
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./nginx.conf:/etc/nginx/nginx.conf
+  #     - ./ssl:/etc/nginx/ssl
+  #   depends_on:
+  #     - pharmida-app
+  #   restart: unless-stopped
+
+volumes:
+  pharmida_uploads:
+    driver: local
+  pharmida_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge

@@ -15,20 +15,41 @@
             <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">Scan Prescription</a></li>
             <li><a href="call-ambulance.html" style="color:#fff;font-weight:600;text-decoration:none;">Call Ambulance</a></li>
             <li><a href="doctor-on-call.html" style="color:#fff;font-weight:600;text-decoration:none;">Doctor on Call</a></li>
-            <li><a href="product-upload.html" style="color:#fff;font-weight:600;text-decoration:none;">Product Upload</a></li>
             <li><a href="checkout.html" style="color:#fff;font-weight:600;text-decoration:none;">Checkout</a></li>
         </ul>
     </nav>
         <main style="max-width:700px;margin:40px auto;padding:20px;">
+        <!-- Quick Navigation -->
+        <div style="background:#f0f7ff;padding:16px;border-radius:8px;margin-bottom:24px;border-left:4px solid #4fd17c;">
+            <h3 style="margin:0 0 8px 0;color:#4fd17c;">📤 Prescription Upload Service</h3>
+            <p style="margin:0;color:#666;">Upload your prescription safely and get your medicines delivered within 24 hours</p>
+        </div>
+        
+        <div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap;">
+            <button onclick="window.location='/scan-prescription.html'" style="background:#2196f3;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">📷 Scan Prescription</button>
+            <button onclick="window.location='/admin.html'" style="background:#667eea;color:#fff;padding:8px 16px;border:none;border-radius:6px;cursor:pointer;">👨‍💼 Admin Panel</button>
+        </div>
+
         <h2>Upload Prescription</h2>
         <div style="background:#fff;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);">
-            <p style="color:#666;margin-bottom:20px;">Upload your prescription and we'll process it within 24 hours. Accepted formats: JPG, PNG, PDF (Max 5MB)</p>
+            <div style="background:#e8f5e8;padding:16px;border-radius:8px;margin-bottom:20px;">
+                <h4 style="margin:0 0 8px 0;color:#4fd17c;">✅ What We Accept</h4>
+                <ul style="margin:8px 0;padding-left:20px;color:#666;">
+                    <li>📱 Photos: JPG, PNG (Mobile camera photos)</li>
+                    <li>📄 Documents: PDF files</li>
+                    <li>📏 Size limit: Maximum 5MB per file</li>
+                    <li>📋 Clear, readable prescriptions only</li>
+                </ul>
+            </div>
+            
             <form id="prescriptionForm" enctype="multipart/form-data">
-                <label>Choose Prescription File</label><br>
-                <input type="file" name="prescription" accept="image/*,application/pdf" required style="margin:10px 0 20px 0;"><br>
-                <label>Additional Notes (Optional)</label><br>
-                <textarea name="notes" placeholder="Any special instructions..." style="width:100%;padding:10px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;" rows="3"></textarea><br>
-                <button type="submit" id="uploadBtn" style="background:#4fd17c;color:#fff;padding:12px 24px;border:none;border-radius:8px;font-weight:600;cursor:pointer;">Upload Prescription</button>
+                <label><strong>Choose Prescription File</strong></label><br>
+                <input type="file" name="prescription" accept="image/*,application/pdf" required style="margin:10px 0 20px 0;padding:8px;border:1px solid #ddd;border-radius:6px;"><br>
+                
+                <label><strong>Additional Notes (Optional)</strong></label><br>
+                <textarea name="notes" placeholder="Any special instructions, delivery preferences, or additional information..." style="width:100%;padding:12px;border-radius:6px;border:1px solid #ccc;margin-bottom:16px;" rows="4"></textarea><br>
+                
+                <button type="submit" id="uploadBtn" style="background:#4fd17c;color:#fff;padding:14px 28px;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:1.1em;">📤 Upload Prescription</button>
                 <span id="status" style="margin-left:12px;font-weight:600;"></span>
             </form>
             <div id="result" style="margin-top:20px;"></div>

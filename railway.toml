@@ -1,0 +1,10 @@
+# Railway.app deployment configuration
+# This file tells Railway how to deploy your app
+
+[build]
+builder = "DOCKERFILE"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 300

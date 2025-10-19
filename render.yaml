@@ -1,13 +1,23 @@
 services:
   - type: web
     name: pharmida-backend
-    env: node
-    buildCommand: npm install
-    startCommand: node server.js
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter
+    region: oregon
+    branch: main
+    healthCheckPath: /
     envVars:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: 3000
       - key: ADMIN_PASSWORD
-        value: admin123
+        generateValue: true
       - key: JWT_SECRET
         generateValue: true
+    # Add your environment variables in Render dashboard:
+    # - RAZORPAY_KEY_ID
+    # - RAZORPAY_KEY_SECRET  
+    # - EMAIL_USER
+    # - EMAIL_PASS

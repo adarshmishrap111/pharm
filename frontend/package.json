@@ -1,0 +1,23 @@
+{
+  "name": "pharm-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Pharm application",
+  "main": "index.html",
+  "scripts": {
+    "start": "serve -s . -l 3000",
+    "build": "echo 'No build process needed for static HTML'",
+    "dev": "serve -s . -l 3000"
+  },
+  "keywords": [
+    "pharmacy",
+    "frontend",
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}

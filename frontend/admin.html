@@ -1,0 +1,219 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Admin - Pharmida</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main style="max-width:1100px;margin:24px auto;">
+    <h2>Admin Panel</h2>
+
+        <div id="adminUI" style="display:none;margin-top:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>Signed in as <strong>admin</strong></div>
+        <div>
+          <button onclick="window.location='/admin-dashboard.html'" style="padding:8px 16px;background:#667eea;border:none;border-radius:6px;color:#fff;cursor:pointer;margin-right:8px;">Dashboard</button>
+          <button id="logoutBtn" style="padding:8px 12px;background:#ff6b6b;border:none;border-radius:6px;color:#fff;cursor:pointer">Logout</button>
+        </div>
+      </div>
+      
+      <!-- Navigation Tabs -->
+      <div style="margin-bottom:24px;border-bottom:2px solid #eee;">
+        <button id="productsTab" class="tab-btn active" onclick="showTab('products')" style="padding:12px 24px;border:none;background:none;font-weight:600;color:#667eea;border-bottom:3px solid #667eea;cursor:pointer;">Products</button>
+        <button id="prescriptionsTab" class="tab-btn" onclick="showTab('prescriptions')" style="padding:12px 24px;border:none;background:none;font-weight:600;color:#999;border-bottom:3px solid transparent;cursor:pointer;">Prescriptions</button>
+      </div>
+
+      <!-- Products Section -->
+      <div id="productsSection">
+        <h3>Products</h3>
+        <div id="productList"></div>
+        <h3 style="margin-top:22px">Add New Product</h3>
+        <form id="adminUpload" enctype="multipart/form-data">
+          <input name="productName" placeholder="Name" required style="width:60%"><br><br>
+          <input name="price" placeholder="Price" required type="number"><br><br>
+          <input name="productImage" type="file" accept="image/*" required><br><br>
+          <textarea name="description" placeholder="Description"></textarea><br><br>
+          <input name="discount" placeholder="Discount (eg 10% Off)"><br><br>
+          <button type="submit">Add Product</button>
+          <span id="adminStatus" style="margin-left:12px;font-weight:600;color:#206030"></span>
+        </form>
+      </div>
+
+      <!-- Prescriptions Section -->
+      <div id="prescriptionsSection" style="display:none;">
+        <h3>Prescription Management</h3>
+        <div style="background:#f8f9fa;padding:16px;border-radius:8px;margin-bottom:20px;">
+          <h4 style="margin:0 0 12px 0;color:#667eea;">📋 All Prescription Uploads</h4>
+          <p style="margin:0;color:#666;">Review and manage customer prescription uploads</p>
+        </div>
+        <div id="prescriptionList" style="margin-top:16px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // On load: check server-side session. If not authenticated, redirect to login page.
+    (async function(){
+      try {
+        const res = await fetch('/api/session', { credentials: 'same-origin' });
+        if (!res.ok) { window.location.href = '/admin-login.html'; return; }
+        const json = await res.json();
+        if (json && json.ok) { 
+          document.getElementById('adminUI').style.display='block'; 
+          loadProducts(); 
+          loadPrescriptions();
+        }
+        else { window.location.href = '/admin-login.html'; }
+      } catch (err) { window.location.href = '/admin-login.html'; }
+    })();
+
+    // Tab Management
+    function showTab(tabName) {
+      // Hide all sections
+      document.getElementById('productsSection').style.display = 'none';
+      document.getElementById('prescriptionsSection').style.display = 'none';
+      
+      // Remove active class from all tabs
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.style.color = '#999';
+        btn.style.borderBottom = '3px solid transparent';
+      });
+      
+      // Show selected section and activate tab
+      if (tabName === 'products') {
+        document.getElementById('productsSection').style.display = 'block';
+        document.getElementById('productsTab').style.color = '#667eea';
+        document.getElementById('productsTab').style.borderBottom = '3px solid #667eea';
+      } else if (tabName === 'prescriptions') {
+        document.getElementById('prescriptionsSection').style.display = 'block';
+        document.getElementById('prescriptionsTab').style.color = '#667eea';
+        document.getElementById('prescriptionsTab').style.borderBottom = '3px solid #667eea';
+        loadPrescriptions(); // Refresh prescriptions when tab is opened
+      }
+    }
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+      window.location.href = '/admin-login.html';
+    });
+    async function loadProducts() {
+      const res = await fetch('/api/products');
+      const data = await res.json();
+      const list = document.getElementById('productList');
+      list.innerHTML = '';
+      data.products.forEach(p => {
+        const row = document.createElement('div');
+        row.style.display='flex'; row.style.gap='12px'; row.style.alignItems='center'; row.style.padding='8px 0';
+        row.innerHTML = `<img src="${p.imageUrl}" style="width:80px;height:60px;object-fit:cover;border-radius:6px;"/><div style="flex:1;"><strong>${p.name}</strong><div>₹${p.price}</div><div>${p.description||''}</div></div><div><button data-id="${p.id}" class="editBtn">Edit</button> <button data-id="${p.id}" class="delBtn">Delete</button></div>`;
+        list.appendChild(row);
+      });
+      document.querySelectorAll('.delBtn').forEach(b => b.addEventListener('click', async (e) => {
+        if (!confirm('Delete product?')) return;
+        const id = e.target.dataset.id;
+        await fetch('/api/products/'+id, { method: 'DELETE', credentials: 'same-origin' });
+        loadProducts();
+      }));
+      document.querySelectorAll('.editBtn').forEach(b => b.addEventListener('click', (e) => {
+        const id = e.target.dataset.id; window.location = '/admin-edit.html?id='+id;
+      }));
+    }
+
+    async function loadPrescriptions() {
+      try {
+        const res = await fetch('/api/prescriptions', { credentials: 'same-origin' });
+        const data = await res.json();
+        const list = document.getElementById('prescriptionList');
+        
+        if (data.prescriptions && data.prescriptions.length > 0) {
+          list.innerHTML = data.prescriptions.map(p => {
+            const date = new Date(p.createdAt).toLocaleDateString();
+            const statusColor = p.status === 'pending' ? '#ffa500' : p.status === 'approved' ? '#4caf50' : '#f44336';
+            const statusText = p.status.charAt(0).toUpperCase() + p.status.slice(1);
+            
+            return `
+              <div style="background:#fff;border:1px solid #ddd;border-radius:8px;padding:16px;margin-bottom:12px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;">
+                  <div>
+                    <h4 style="margin:0 0 4px 0;color:#333;">Prescription #${p.id}</h4>
+                    <p style="margin:0;color:#666;font-size:0.9em;">📅 ${date} | 👤 User ID: ${p.userId || 'Anonymous'}</p>
+                  </div>
+                  <span style="background:${statusColor};color:#fff;padding:4px 12px;border-radius:20px;font-size:0.8em;font-weight:600;">${statusText}</span>
+                </div>
+                
+                <div style="margin-bottom:12px;">
+                  <strong>Notes:</strong> ${p.notes || 'No notes provided'}
+                </div>
+                
+                <div style="display:flex;gap:8px;align-items:center;">
+                  <a href="${p.fileUrl}" target="_blank" style="background:#667eea;color:#fff;padding:6px 12px;border-radius:4px;text-decoration:none;font-size:0.9em;">📄 View File</a>
+                  
+                  <select onchange="updatePrescriptionStatus(${p.id}, this.value)" style="padding:6px;border-radius:4px;border:1px solid #ccc;">
+                    <option value="pending" ${p.status === 'pending' ? 'selected' : ''}>Pending</option>
+                    <option value="approved" ${p.status === 'approved' ? 'selected' : ''}>Approved</option>
+                    <option value="rejected" ${p.status === 'rejected' ? 'selected' : ''}>Rejected</option>
+                  </select>
+                  
+                  <button onclick="deletePrescription(${p.id})" style="background:#ff6b6b;color:#fff;padding:6px 12px;border:none;border-radius:4px;cursor:pointer;font-size:0.9em;">🗑️ Delete</button>
+                </div>
+              </div>
+            `;
+          }).join('');
+        } else {
+          list.innerHTML = '<div style="text-align:center;padding:40px;color:#666;">📋 No prescriptions uploaded yet</div>';
+        }
+      } catch (err) {
+        console.error('Error loading prescriptions:', err);
+        document.getElementById('prescriptionList').innerHTML = '<div style="color:#ff6b6b;padding:20px;text-align:center;">❌ Error loading prescriptions</div>';
+      }
+    }
+
+    async function updatePrescriptionStatus(id, status) {
+      try {
+        const res = await fetch(`/api/prescriptions/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'same-origin',
+          body: JSON.stringify({ status })
+        });
+        
+        if (res.ok) {
+          loadPrescriptions(); // Refresh list
+        } else {
+          alert('Failed to update status');
+        }
+      } catch (err) {
+        alert('Error updating status');
+      }
+    }
+
+    async function deletePrescription(id) {
+      if (!confirm('Are you sure you want to delete this prescription?')) return;
+      
+      try {
+        const res = await fetch(`/api/prescriptions/${id}`, {
+          method: 'DELETE',
+          credentials: 'same-origin'
+        });
+        
+        if (res.ok) {
+          loadPrescriptions(); // Refresh list
+        } else {
+          alert('Failed to delete prescription');
+        }
+      } catch (err) {
+        alert('Error deleting prescription');
+      }
+    }
+
+    document.getElementById('adminUpload').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      document.getElementById('adminStatus').textContent = 'Uploading...';
+  const res = await fetch('/api/products', { method: 'POST', body: fd, credentials: 'same-origin' });
+      const data = await res.json();
+      if (res.ok) { document.getElementById('adminStatus').textContent = 'Added'; loadProducts(); e.target.reset(); setTimeout(()=>document.getElementById('adminStatus').textContent='',1200);} else { document.getElementById('adminStatus').textContent = data.error || 'Error'; }
+    });
+  </script>
+</body>
+</html>

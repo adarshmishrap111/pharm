@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Upload - Pharmida Healthcare</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .upload-card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; margin: 8px 4px; }
+        .btn-primary { background: #4fd17c; color: #fff; }
+        .btn-secondary { background: #667eea; color: #fff; }
+        .btn-warning { background: #ff9800; color: #fff; }
+        .btn-danger { background: #f44336; color: #fff; }
+        .status-message { padding: 12px; border-radius: 8px; margin: 16px 0; font-weight: 600; }
+        .status-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .status-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .status-info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        .quick-actions { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 24px; }
+        .action-buttons { display: flex; gap: 12px; flex-wrap: wrap; }
+        .product-preview { background: #f0f7ff; padding: 20px; border-radius: 8px; margin-top: 20px; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <nav class="main-navbar" style="width:100vw;background:#17613e;padding:0.5em 0;">
+        <ul style="display:flex;justify-content:center;align-items:center;gap:32px;list-style:none;margin:0;padding:0;">
+            <li><a href="index.html" style="color:#fff;font-weight:600;text-decoration:none;">🏠 Home</a></li>
+            <li><a href="admin.html" style="color:#fff;font-weight:600;text-decoration:none;">👨‍💼 Admin Panel</a></li>
+            <li><a href="admin-dashboard.html" style="color:#fff;font-weight:600;text-decoration:none;">📊 Dashboard</a></li>
+            <li><a href="upload-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">📤 Upload Prescription</a></li>
+            <li><a href="scan-prescription.html" style="color:#fff;font-weight:600;text-decoration:none;">📷 Scan Prescription</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <h3 style="margin:0 0 16px 0;color:#667eea;">🚀 Admin Quick Actions</h3>
+            <div class="action-buttons">
+                <button onclick="window.location='/admin.html'" class="btn btn-secondary">👨‍💼 Admin Panel</button>
+                <button onclick="window.location='/admin-dashboard.html'" class="btn btn-warning">📊 Dashboard</button>
+                <button onclick="window.location='/upload-prescription.html'" class="btn btn-primary">📤 Upload Prescription</button>
+                <button onclick="window.location='/scan-prescription.html'" class="btn btn-secondary">📷 Scan Prescription</button>
+            </div>
+        </div>
+
+        <!-- Product Upload Form -->
+        <div class="upload-card">
+            <div style="text-align:center;margin-bottom:24px;">
+                <h1 style="color:#4fd17c;margin:0 0 8px 0;">📦 Product Upload</h1>
+                <p style="color:#666;margin:0;">Add new products to your pharmacy inventory</p>
+            </div>
+
+            <!-- Session Status -->
+            <div id="sessionStatus" class="status-message status-info" style="display:none;">
+                ⚠️ Admin session required. Please login first.
+            </div>
+
+            <!-- Upload Form -->
+            <form id="productUploadForm" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="productName">📝 Product Name *</label>
+                    <input type="text" id="productName" name="productName" placeholder="Enter product name (e.g., Paracetamol 500mg)" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="price">💰 Price (₹) *</label>
+                    <input type="number" id="price" name="price" placeholder="Enter price in rupees" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="category">🏷️ Category</label>
+                    <select id="category" name="category">
+                        <option value="">Select Category</option>
+                        <option value="medicines">Medicines</option>
+                        <option value="health-fitness">Health & Fitness</option>
+                        <option value="personal-care">Personal Care</option>
+                        <option value="mom-baby">Mom & Baby</option>
+                        <option value="elderly-care">Elderly Care</option>
+                        <option value="food-beverages">Food & Beverages</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="productImage">📸 Product Image *</label>
+                    <input type="file" id="productImage" name="productImage" accept="image/*" required>
+                    <small style="color:#666;">Supported formats: JPG, PNG, GIF (Max 5MB)</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">📋 Product Description *</label>
+                    <textarea id="description" name="description" placeholder="Enter detailed product description, usage instructions, benefits, etc." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="discount">🏷️ Discount (Optional)</label>
+                    <input type="text" id="discount" name="discount" placeholder="e.g., 10% Off, Buy 1 Get 1 Free">
+                </div>
+
+                <div class="form-group">
+                    <button id="uploadBtn" type="submit" class="btn btn-primary" style="width:100%;font-size:16px;padding:16px;">
+                        📤 Upload Product
+                    </button>
+                </div>
+            </form>
+
+            <!-- Status Display -->
+            <div id="statusDisplay"></div>
+
+            <!-- Result Display -->
+            <div id="resultDisplay"></div>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('productUploadForm');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const statusDisplay = document.getElementById('statusDisplay');
+        const resultDisplay = document.getElementById('resultDisplay');
+        const sessionStatus = document.getElementById('sessionStatus');
+
+        // Check admin session on page load
+        (async function checkSession() {
+            try {
+                const response = await fetch('/api/session', { credentials: 'same-origin' });
+                if (!response.ok) {
+                    sessionStatus.style.display = 'block';
+                    sessionStatus.innerHTML = '⚠️ Admin session required. <a href="/admin-login.html" style="color:#0c5460;font-weight:600;">Login here</a>';
+                    form.style.opacity = '0.5';
+                    form.style.pointerEvents = 'none';
+                }
+            } catch (error) {
+                console.log('Session check failed:', error);
+                sessionStatus.style.display = 'block';
+                sessionStatus.innerHTML = '⚠️ Unable to verify session. Please ensure backend is running on port 3000.';
+            }
+        })();
+
+        // Form submission handler
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Reset status
+            statusDisplay.innerHTML = '';
+            resultDisplay.innerHTML = '';
+            
+            // Validate form
+            if (!validateForm()) return;
+            
+            // Show loading state
+            showLoading(true);
+            
+            try {
+                const formData = new FormData(form);
+                
+                // Add additional metadata
+                formData.append('uploadedBy', 'admin');
+                formData.append('uploadDate', new Date().toISOString());
+                
+                console.log('Uploading product...');
+                
+                const response = await fetch('/api/products', {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showSuccess(result);
+                } else {
+                    showError(result.error || 'Upload failed');
+                }
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showError('Network error: ' + error.message);
+            } finally {
+                showLoading(false);
+            }
+        });
+
+        function validateForm() {
+            const requiredFields = ['productName', 'price', 'productImage', 'description'];
+            let isValid = true;
+            
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    field.style.borderColor = '#f44336';
+                    isValid = false;
+                } else {
+                    field.style.borderColor = '#ddd';
+                }
+            });
+            
+            if (!isValid) {
+                showError('Please fill in all required fields');
+            }
+            
+            return isValid;
+        }
+
+        function showLoading(show) {
+            if (show) {
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '⏳ Uploading...';
+                form.classList.add('loading');
+            } else {
+                uploadBtn.disabled = false;
+                uploadBtn.textContent = '📤 Upload Product';
+                form.classList.remove('loading');
+            }
+        }
+
+        function showSuccess(result) {
+            const product = result.product;
+            
+            statusDisplay.innerHTML = `
+                <div class="status-message status-success">
+                    ✅ Product uploaded successfully!
+                </div>
+            `;
+            
+            resultDisplay.innerHTML = `
+                <div class="product-preview">
+                    <h3 style="margin:0 0 16px 0;color:#4fd17c;">📦 Product Preview</h3>
+                    <div style="display:flex;gap:20px;align-items:start;flex-wrap:wrap;">
+                        <img src="${product.imageUrl}" style="width:120px;height:120px;object-fit:cover;border-radius:8px;border:2px solid #4fd17c;" alt="${product.name}">
+                        <div style="flex:1;min-width:200px;">
+                            <h4 style="margin:0 0 8px 0;color:#333;">${product.name}</h4>
+                            <p style="margin:0 0 8px 0;color:#4fd17c;font-size:18px;font-weight:600;">₹${parseFloat(product.price).toFixed(2)}</p>
+                            <p style="margin:0 0 12px 0;color:#666;">${product.description}</p>
+                            ${product.discount ? `<p style="margin:0 0 12px 0;color:#ff9800;font-weight:600;">🏷️ ${product.discount}</p>` : ''}
+                            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                                <button onclick="window.location='/index.html'" class="btn btn-primary">🏠 View on Homepage</button>
+                                <button onclick="window.location='/admin.html'" class="btn btn-secondary">👨‍💼 Admin Panel</button>
+                                <button onclick="window.location='/admin-dashboard.html'" class="btn btn-warning">📊 Dashboard</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Reset form
+            form.reset();
+            
+            // Auto redirect after delay
+            setTimeout(() => {
+                if (confirm('Product uploaded successfully! Would you like to go to the homepage to see it?')) {
+                    window.location.href = '/index.html';
+                }
+            }, 2000);
+        }
+
+        function showError(message) {
+            statusDisplay.innerHTML = `
+                <div class="status-message status-error">
+                    ❌ ${message}
+                </div>
+            `;
+            
+            // Auto clear error after 5 seconds
+            setTimeout(() => {
+                statusDisplay.innerHTML = '';
+            }, 5000);
+        }
+
+        // Image preview functionality
+        document.getElementById('productImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                // Check file size (5MB limit)
+                if (file.size > 5 * 1024 * 1024) {
+                    showError('Image size should be less than 5MB');
+                    this.value = '';
+                    return;
+                }
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview') || document.createElement('div');
+                    preview.id = 'imagePreview';
+                    preview.innerHTML = `
+                        <div style="margin-top:12px;">
+                            <small style="color:#666;">Preview:</small><br>
+                            <img src="${e.target.result}" style="width:100px;height:100px;object-fit:cover;border-radius:6px;border:1px solid #ddd;margin-top:8px;">
+                        </div>
+                    `;
+                    document.getElementById('productImage').parentNode.appendChild(preview);
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
+                    } catch (e) { window.location = '/admin-login.html'; }
+                })();
+    </script>
+</body>
+</html>

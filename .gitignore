@@ -1,17 +1,21 @@
 # Dependencies
 node_modules/
+*/node_modules/
 package-lock.json
+*/package-lock.json
 
 # Environment variables
 .env
+*/.env
 
 # Database
 data.sqlite
 *.db
+backend/data.sqlite
 
 # Uploads
-assets/uploads/*
-!assets/uploads/.gitkeep
+frontend/assets/uploads/*
+!frontend/assets/uploads/.gitkeep
 
 # Logs
 *.log

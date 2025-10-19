@@ -82,6 +82,7 @@
       e.preventDefault();
       errorEl.style.display = 'none';
       submitBtn.disabled = true; submitBtn.textContent = 'Signing in...';
+      
       try {
         const res = await fetch('/api/login', {
           method: 'POST',
@@ -89,16 +90,47 @@
           credentials: 'same-origin',
           body: JSON.stringify({ password: pwd.value })
         });
+        
         const json = await res.json();
+        
         if (!res.ok) throw new Error(json && json.error ? json.error : 'Login failed');
-        // success: redirect to admin UI
-        window.location.href = 'admin.html';
+        
+        // Store token in cookie for page protection
+        if (json.token) {
+          document.cookie = `adminToken=${json.token}; path=/; max-age=86400; secure; samesite=strict`;
+        }
+        
+        // Check if there's a redirect URL from protected page access
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectUrl = urlParams.get('redirect');
+        
+        if (redirectUrl) {
+          // Redirect to originally requested admin page
+          window.location.href = redirectUrl;
+        } else {
+          // Default redirect to admin dashboard
+          window.location.href = 'admin-dashboard.html';
+        }
+        
       } catch (err) {
         errorEl.textContent = err.message || 'Login failed';
         errorEl.style.display = 'block';
-        submitBtn.disabled = false; submitBtn.textContent = 'Sign in';
+        submitBtn.disabled = false; 
+        submitBtn.textContent = 'Sign in';
       }
     });
+
+    // Check if user came here due to unauthorized access
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    
+    if (error === 'unauthorized') {
+      errorEl.textContent = '🔒 You need to login to access admin pages';
+      errorEl.style.display = 'block';
+    } else if (error === 'invalid_token') {
+      errorEl.textContent = '🔑 Your session expired. Please login again';
+      errorEl.style.display = 'block';
+    }
   </script>
 </body>
 </html>

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Admin Access - Pharmida</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .container { max-width: 800px; margin: 40px auto; padding: 20px; }
+        .access-card { background: #fff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .status-indicator { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-right: 8px; }
+        .status-online { background: #4caf50; }
+        .status-offline { background: #f44336; }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-decoration: none; display: inline-block; margin: 8px; }
+        .btn-primary { background: #4fd17c; color: #fff; }
+        .btn-secondary { background: #667eea; color: #fff; }
+        .btn-warning { background: #ff9800; color: #fff; }
+        .error-log { background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 16px; margin-top: 16px; font-family: monospace; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="access-card">
+            <h1>🚀 Admin Quick Access</h1>
+            <p>Pharmacy application admin access and troubleshooting</p>
+            
+            <div id="serverStatus" style="margin: 20px 0;">
+                <h3>Server Status</h3>
+                <div id="statusDisplay">
+                    <span class="status-indicator status-offline"></span>
+                    <span>Checking server status...</span>
+                </div>
+            </div>
+
+            <div style="margin: 24px 0;">
+                <h3>Quick Actions</h3>
+                <a href="/admin-login.html" class="btn btn-primary">🔐 Admin Login</a>
+                <a href="/admin.html" class="btn btn-secondary">👨‍💼 Admin Panel</a>
+                <a href="/admin-dashboard.html" class="btn btn-warning">📊 Dashboard</a>
+                <button onclick="testBackend()" class="btn btn-secondary">🔧 Test Backend</button>
+            </div>
+
+            <div style="margin: 24px 0;">
+                <h3>Default Credentials</h3>
+                <div style="background: #f0f7ff; padding: 16px; border-radius: 8px;">
+                    <strong>Admin Password:</strong> admin123<br>
+                    <strong>Backend Port:</strong> 3000<br>
+                    <strong>Frontend Port:</strong> 5500 (Live Server)
+                </div>
+            </div>
+
+            <div id="testResults" style="margin: 24px 0;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check server status on page load
+        checkServerStatus();
+
+        async function checkServerStatus() {
+            const statusDisplay = document.getElementById('statusDisplay');
+            try {
+                const res = await fetch('/api/products');
+                if (res.ok) {
+                    statusDisplay.innerHTML = '<span class="status-indicator status-online"></span><span>Backend server is running ✅</span>';
+                } else {
+                    statusDisplay.innerHTML = '<span class="status-indicator status-offline"></span><span>Backend server error ❌</span>';
+                }
+            } catch (err) {
+                statusDisplay.innerHTML = '<span class="status-indicator status-offline"></span><span>Backend server offline ❌</span>';
+            }
+        }
+
+        async function testBackend() {
+            const resultsDiv = document.getElementById('testResults');
+            resultsDiv.innerHTML = '<h3>🔧 Backend Test Results</h3><div>Testing backend endpoints...</div>';
+            
+            const tests = [
+                { name: 'Products API', url: '/api/products' },
+                { name: 'Session Check', url: '/api/session' },
+                { name: 'Health Check', url: '/api/health' }
+            ];
+
+            let results = '<div class="error-log">';
+            
+            for (const test of tests) {
+                try {
+                    const res = await fetch(test.url);
+                    const status = res.ok ? '✅' : '❌';
+                    results += `${status} ${test.name}: ${res.status} ${res.statusText}\\n`;
+                } catch (err) {
+                    results += `❌ ${test.name}: Connection failed - ${err.message}\\n`;
+                }
+            }
+            
+            results += '</div>';
+            resultsDiv.innerHTML = '<h3>🔧 Backend Test Results</h3>' + results;
+        }
+
+        // Auto-refresh status every 30 seconds
+        setInterval(checkServerStatus, 30000);
+    </script>
+</body>
+</html>
