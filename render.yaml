@@ -16,8 +16,15 @@ services:
         generateValue: true
       - key: JWT_SECRET
         generateValue: true
-    # Add your environment variables in Render dashboard:
-    # - RAZORPAY_KEY_ID
-    # - RAZORPAY_KEY_SECRET  
-    # - EMAIL_USER
-    # - EMAIL_PASS
+      - key: RAZORPAY_KEY_ID
+        value: ""
+      - key: RAZORPAY_KEY_SECRET
+        value: ""
+      - key: EMAIL_USER
+        value: ""
+      - key: EMAIL_PASS
+        value: ""
+      - key: FIREBASE_ADMIN_JSON
+        value: ""
+      - key: FIREBASE_STORAGE_BUCKET
+        value: pharmida-healthcare.appspot.com
