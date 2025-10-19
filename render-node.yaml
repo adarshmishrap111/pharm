@@ -1,13 +1,13 @@
 services:
   - type: web
-    name: pharmida-backend
-    env: docker
-    dockerfilePath: ./Dockerfile
+    name: pharmida-backend-node
+    env: node
     plan: starter
     region: oregon
     branch: main
+    buildCommand: cd backend && npm install --production
+    startCommand: cd backend && node server.js
     healthCheckPath: /
-    dockerCommand: node server.js
     envVars:
       - key: NODE_ENV
         value: production
