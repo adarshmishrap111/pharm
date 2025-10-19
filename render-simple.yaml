@@ -1,10 +1,12 @@
 services:
   - type: web
-    name: pharmida-backend
-    env: docker
+    name: pharmida-app
+    env: node
     plan: starter
     region: oregon
     branch: main
+    buildCommand: cd backend && npm install --production
+    startCommand: cd backend && node server.js
     healthCheckPath: /
     envVars:
       - key: NODE_ENV
@@ -23,7 +25,3 @@ services:
         value: ""
       - key: EMAIL_PASS
         value: ""
-      - key: FIREBASE_ADMIN_JSON
-        value: ""
-      - key: FIREBASE_STORAGE_BUCKET
-        value: pharmida-healthcare.appspot.com
